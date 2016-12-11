@@ -4223,7 +4223,7 @@ ModuleEnd:
 				line = ssh.StrokeTauntVal
 			End If
 
-			If line = lines.Count Then
+			If line >= lines.Count Then
 				If ssh.ShowModule = True Then
 					ssh.ModuleEnd = True
 					GoTo ModuleEnd
