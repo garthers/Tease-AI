@@ -1,17 +1,24 @@
 /* Chat fallback style */
 /* This stylesheet is used, if there was no custom stylesheet found at: [Tease-AI-Root]\System\CSS\ChatWindow.css */
 
-body {font: 16px Cambria; color:/*ChatTextColor*/; background-color: /*ChatWindowColor*/;}
+body {
+	word-wrap:break-word;
+	font: 14px Cambria; 
+   	color:/*ChatTextColor*/; 
+	background-color: /*ChatWindowColor*/; 
+}
 
+img{ max-width: 100%; max-height: 300px;}
+#Chat div{margin-bottom: 0.1em;}
 .systemMessage {color: steelblue; font-weight: bold;}
 
 .exception, .inlineError {color: Red; background-color: #FFE6E6;}
 .exception .msg {Display:Block; font-weight: bold;}
 .exception .exMessage {Display: none;}
-.scriptPosInfo {color:green;}
+.scriptPosInfo {font-size: 0.9em; color:green;}
 .warning, .inlineWarning {color:orange; font-weight:bold;}
 
-.timestamp {color: DimGray;}
+.timestamp {font-size: 0.9em; color: DimGray;}
 .sub .name  {color: /*SubNameColor*/; font-family: /*SubFontName*/; font-size: /*SubFontSize*/;}
 .domme .name,    .emoteMessage .domme .text	   {color: /*DommeNameColor*/; font-family: /*DommeFontName*/; font-size: /*DommeFontSize*/;}
 .contact1 .name, .emoteMessage .contact1 .text {color: /*Contact1NameColor*/; font-family: /*DommeFontName*/; font-size: /*DommeFontSize*/;}

@@ -6344,7 +6344,7 @@ CensorConstant:
 			For i As Integer = 0 To myArray.Count - 1
 
 				If myArray(i).Contains("DateDifference") Then
-					Dim DateFlag As String = GetParentheses(StringClean, "DateDifference(")
+					Dim DateFlag As String = GetParentheses(myArray(i), "DateDifference(")
 					Dim OriginalFlag As String = DateFlag
 					DateFlag = FixCommas(DateFlag)
 					Dim DateArray() As String = DateFlag.Split(",")
@@ -18624,7 +18624,7 @@ playLoop:
 			If UCase(Val1) <> UCase(Val2) Then Return True
 		End If
 
-		If Not IsNumeric(Val1) And Not IsNumeric(Val2) Then Return False
+		If Not IsNumeric(Val1) OrElse Not IsNumeric(Val2) Then Return False
 
 		If C_Operator = ">" Then
 			If Val(Val1) > Val(Val2) Then Return True
