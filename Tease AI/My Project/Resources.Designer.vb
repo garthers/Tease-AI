@@ -22,7 +22,7 @@ Namespace My.Resources
     '''<summary>
     '''  A strongly-typed resource class, for looking up localized strings, etc.
     '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"),  _
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0"),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
      Global.Microsoft.VisualBasic.HideModuleNameAttribute()>  _
@@ -129,20 +129,43 @@ Namespace My.Resources
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
-
-		'''<summary>
-		''' Represents the fallback stylesheet of the main and side chat.
-		'''</summary>
-		Friend ReadOnly Property ChatFallbackStyle() As String
+        
+        '''<summary>
+        '''  Looks up a localized string similar to /* Chat fallback style */
+        '''/* This stylesheet is used, if there was no custom stylesheet found at: [Tease-AI-Root]\System\CSS\ChatWindow.css */
+        '''
+        '''body {font: 16px Cambria; color:/*ChatTextColor*/; background-color: /*ChatWindowColor*/;}
+        '''
+        '''.systemMessage {color: steelblue; font-weight: bold;}
+        '''
+        '''.exception, .inlineError {color: Red; background-color: #FFE6E6;}
+        '''.exception .msg {Display:Block; font-weight: bold;}
+        '''.exception .exMessage {Display: none;}
+        '''.scriptPosInfo {color:green;}
+        '''.warning, .inlineWarnin [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property ChatFallbackStyle() As String
             Get
                 Return ResourceManager.GetString("ChatFallbackStyle", resourceCulture)
             End Get
         End Property
-
-		'''<summary>
-		''' Represents the fallback stylesheet of the glitter app.
-		'''</summary>
-		Friend ReadOnly Property GlitterFallbackStyle() As String
+        
+        '''<summary>
+        '''  Looks up a localized string similar to /* Glitter-App fallback style */
+        '''/* This stylesheet is used, if there was no custom stylesheet found at: [Tease-AI-Root]\System\CSS\GlitterApp.css */
+        '''
+        '''body {font: Cambria; color: /*ChatTextColor*/; background-color: /*ChatWindowColor*/;  padding: 5px; margin: 0;}
+        '''.post {
+        '''	width: 100%; 
+        '''	margin-bottom: 0.8em;
+        '''}
+        '''
+        '''.avImg {float: left;width: 48px; height: 48px;}
+        '''.timestamp {font-size: 0.8em; color: DarkGray; display:block;}
+        '''
+        '''.avName_0, .avName_1, .avName_2, .avName_3 {font-size: 1.2em; font-weight:  [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property GlitterFallbackStyle() As String
             Get
                 Return ResourceManager.GetString("GlitterFallbackStyle", resourceCulture)
             End Get
