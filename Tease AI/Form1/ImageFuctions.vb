@@ -2,6 +2,7 @@
 Imports System.IO
 Imports System.Threading
 Imports System.Windows.Forms
+Imports System.Net
 
 Partial Class Form1
 
@@ -603,8 +604,8 @@ NoNeFound:
 	''' <param name="ImageToShow">The Path to the image to disply.</param>
 	''' <param name="WaitToFinish">If True the calling thread is locked in a Application.DoEvents.Lopp until the
 	''' download has finished and the images is displayed.</param>
-	Public Sub ShowImage(ByVal ImageToShow As String, ByVal WaitToFinish As Boolean)
-		If FormLoading = True Then Return
+	Public Function ShowImage(ByVal ImageToShow As String, ByVal WaitToFinish As Boolean) As Boolean
+		If FormLoading = True Then Return False
 
 		Debug.Print(
 			"    _____                                  ______     _         _      " & vbCrLf &
@@ -626,14 +627,26 @@ NoNeFound:
 			FetchContainer.ImageLocation = pathImageErrorOnLoading
 			Dim lazyText As String = "The given imagepath was NULL."
 			Log.WriteError(lazyText, New ArgumentNullException(lazyText), "ShowImage with no valid imagepath.")
+			Return False
 		ElseIf ImageToShow = "" Then
 			' ====================== String.Empty ========================
 			FetchContainer.ImageLocation = pathImageErrorOnLoading
 			Dim lazyText As String = "The given imagepath was empty."
 			Log.WriteError(lazyText, New ArgumentException(lazyText), "ShowImage with no valid imagepath.")
+			Return False
 		Else
 			' ======================== All fine ==========================
 			FetchContainer.ImageLocation = ImageToShow
+		End If
+
+		If (Not File.Exists(ImageToShow) AndAlso Not WebFileExists(ImageToShow)) Then
+
+			Log.WriteError("The given imagepath is not a valid path", New ArgumentNullException("The given imagepath is not a valid path"), "ShowImage with wrong image path : " + ImageToShow + " is not a valid path")
+			RemoveFromLocalTagList(ImageToShow)
+			RemoveFromLikeList(ImageToShow)
+			RemoveFromDislikeList(ImageToShow)
+			RemoveFromUrlFiles(ImageToShow)
+			Return False
 		End If
 
 		If FrmSettings.CBBlogImageWindow.Checked = True _
@@ -649,9 +662,24 @@ NoNeFound:
 		Catch ex As Exception
 			Log.WriteError("Error occurred while displaying image. Fallback Failed.",
 				 ex, "ShowImage(String, Boolean)")
+			Return False
+		End Try
+		Return True
+	End Function
+
+	Public Function WebFileExists(ByVal url As String) As Boolean
+		Dim wc As New WebClient()
+		Try
+			wc.OpenRead(url).Close()
+
+			Return True
+		Catch ex2 As Exception
+		Finally
+			wc.Dispose()
 		End Try
 
-	End Sub
+		Return False
+	End Function
 
 #Region "---------------------------------------------------- BWimageSync -----------------------------------------------------"
 

@@ -145,7 +145,7 @@ Public Class Form1
 		Try
 
 			mainPictureBox.Image = Nothing
-			WatchDogImageAnimator.Dispose()
+			'WatchDogImageAnimator.Dispose()
 
 			Debug.Print("Here?")
 
@@ -220,11 +220,58 @@ Public Class Form1
 	End Sub
 
 
+	Public Sub CheckRandomOpportunities()
+		Dim randomDir As DirectoryInfo = Nothing
 
+		Try
+
+			If Not String.IsNullOrEmpty(My.Settings.RandomImageDir) AndAlso Directory.Exists(My.Settings.RandomImageDir) Then
+				randomDir = New DirectoryInfo(My.Settings.RandomImageDir)
+			Else
+				FrmSettings.CBRandomGlitter.Enabled = False
+				FrmSettings.CBRandomGlitter.Checked = False
+				My.Settings.CBRandomGlitter = False
+				FrmSettings.CBRandomDomme.Enabled = False
+				FrmSettings.CBRandomDomme.Checked = False
+				My.Settings.CBRandomDomme = False
+				Return
+			End If
+
+			If randomDir.GetDirectories().Count() <= 0 Then
+				FrmSettings.CBRandomDomme.Enabled = False
+				FrmSettings.CBRandomDomme.Checked = False
+				My.Settings.CBRandomDomme = False
+			Else
+				FrmSettings.CBRandomDomme.Enabled = True
+				FrmSettings.CBRandomDomme.Checked = My.Settings.CBRandomDomme
+			End If
+
+			If randomDir.GetDirectories().Count() < 4 Then
+				FrmSettings.CBRandomGlitter.Enabled = False
+				FrmSettings.CBRandomGlitter.Checked = False
+				My.Settings.CBRandomGlitter = False
+			End If
+
+			If randomDir.GetDirectories().Count() >= 4 Then
+				FrmSettings.CBRandomGlitter.Enabled = True
+				FrmSettings.CBRandomGlitter.Checked = My.Settings.CBRandomGlitter
+			End If
+		Catch
+			FrmSettings.CBRandomGlitter.Enabled = False
+			FrmSettings.CBRandomGlitter.Checked = False
+			My.Settings.CBRandomGlitter = False
+			FrmSettings.CBRandomDomme.Enabled = False
+			FrmSettings.CBRandomDomme.Checked = False
+			My.Settings.CBRandomDomme = False
+		End Try
+	End Sub
 
 
 
 	Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+		Dim enumerator As IEnumerator = Nothing
+		Dim GlitterScriptCount As Integer = 0
+		Dim LoginAmt As Integer = 0
 		Try
 retryStart:
 			ssh.dommePresent = True
@@ -235,7 +282,7 @@ retryStart:
 			Debug.Print("Form 2 Opened")
 
 			Dim tv As Version = My.Application.Info.Version
-			Me.Text = String.Format("Tease A.I. - PATCH {0}.{1}{2}",
+			Me.Text = String.Format("Tease A.I. - PATCH {0}.{1}{2} WITH SWEET PATCH(24)",
 				 tv.Minor,
 				 tv.Build,
 				 If(tv.MinorRevision > 0, "." & tv.MinorRevision, ""))
@@ -6758,22 +6805,24 @@ CensorConstant:
 							   Optional ByVal startRecurrence As Integer = 0) As String
 
 		Dim AlreadyChecked As List(Of String) = New List(Of String)
-#If TRACE Then
+		Dim dotrace As Boolean = True
 		Dim TS As New TraceSwitch("PoundClean", "")
-
-		If TS.TraceVerbose Then
-			Trace.WriteLine("============= PoundClean(String) =============")
-			Trace.Indent()
-			Trace.WriteLine(String.Format("StartValue: ""{0}""", stringClean))
-		ElseIf TS.TraceInfo Then
-			Trace.WriteLine(String.Format("PoundClean(String) parsing: ""{0}""", stringClean))
-			Trace.Indent()
-		End If
-
-		Dim Sw As New Stopwatch
 		Dim StartTime As Date = Now
-		Sw.Start()
-#End If
+
+		If dotrace Then
+
+			If TS.TraceVerbose Then
+				Trace.WriteLine("============= PoundClean(String) =============")
+				Trace.Indent()
+				Trace.WriteLine(String.Format("StartValue: ""{0}""", stringClean))
+			ElseIf TS.TraceInfo Then
+				Trace.WriteLine(String.Format("PoundClean(String) parsing: ""{0}""", stringClean))
+				Trace.Indent()
+			End If
+
+			Dim Sw As New Stopwatch
+			Sw.Start()
+		End If
 		Dim OrgString As String = stringClean
 		Dim ActRecurrence As Integer = startRecurrence
 
@@ -6790,17 +6839,17 @@ CensorConstant:
 		Do While ActRecurrence < 6 AndAlso RegexKeyWords.IsMatch(stringClean)
 			ActRecurrence += 1
 
-#If TRACE Then
-			If TS.TraceVerbose Then
-				Trace.WriteLine(String.Format("Starting scan run {0} on ""{1}""", ActRecurrence, stringClean))
-				Trace.Indent()
+			If dotrace Then
+				If TS.TraceVerbose Then
+					Trace.WriteLine(String.Format("Starting scan run {0} on ""{1}""", ActRecurrence, stringClean))
+					Trace.Indent()
+				End If
 			End If
-#End If
 
 			stringClean = SysKeywordClean(stringClean)
-#If TRACE Then
-			If TS.TraceVerbose Then Trace.WriteLine(String.Format("System keywords cleaned: ""{0}""", stringClean))
-#End If
+			If dotrace Then
+				If TS.TraceVerbose Then Trace.WriteLine(String.Format("System keywords cleaned: ""{0}""", stringClean))
+			End If
 
 			' Find all remaining #Keywords.
 			Dim Re As New Regex(Pattern, RegexOptions.IgnoreCase)
@@ -6815,9 +6864,9 @@ CensorConstant:
 				' Start next loop if we already checked this vocab.
 				If AlreadyChecked.Contains(Keyword.Value, StringComparer.OrdinalIgnoreCase) Then Continue For
 
-#If TRACE Then
-				If TS.TraceVerbose Then Trace.WriteLine(String.Format("Applying vocabulary: ""{0}""", Keyword.Value))
-#End If
+				If dotrace Then
+					If TS.TraceVerbose Then Trace.WriteLine(String.Format("Applying vocabulary: ""{0}""", Keyword.Value))
+				End If
 				AlreadyChecked.Add(Keyword.Value)
 				Dim Replacement As String = ""
 
@@ -6883,37 +6932,37 @@ CensorConstant:
 
 			Next
 
-#If TRACE Then
-			Trace.Unindent()
-#End If
+			If dotrace Then
+				Trace.Unindent()
+			End If
 		Loop
 
 		If RegexKeyWords.IsMatch(stringClean) Then
-#If TRACE Then
-			If TS.TraceError Then
-				Trace.WriteLine("PoundClean(String): Stopping scan, maximum allowed scan depth reached.")
-				Trace.Indent()
-				Trace.WriteLine(String.Format("StartValue: ""{0}""", OrgString))
-				Trace.WriteLine(String.Format("EndValue:   ""{0}""", stringClean))
-				Trace.Unindent()
+			If dotrace Then
+				If TS.TraceError Then
+					Trace.WriteLine("PoundClean(String): Stopping scan, maximum allowed scan depth reached.")
+					Trace.Indent()
+					Trace.WriteLine(String.Format("StartValue: ""{0}""", OrgString))
+					Trace.WriteLine(String.Format("EndValue:   ""{0}""", stringClean))
+					Trace.Unindent()
+				End If
 			End If
-#End If
 			Log.WriteError("Maximum allowed Vocabulary depth reached for line:" & OrgString & vbCrLf &
 							  "Aborted Cleaning at: " & stringClean,
 							  New StackOverflowException("PoundClean infinite loop protection"), "PoundClean(String)")
 		Else
-#If TRACE Then
-			If TS.TraceVerbose Then
-				Trace.WriteLine(String.Format("EndValue: ""{0}""", stringClean))
-				Trace.WriteLine(String.Format("Duration: {0}ms", (Now - StartTime).TotalMilliseconds.ToString))
+			If dotrace Then
+				If TS.TraceVerbose Then
+					Trace.WriteLine(String.Format("EndValue: ""{0}""", stringClean))
+					Trace.WriteLine(String.Format("Duration: {0}ms", (Now - StartTime).TotalMilliseconds.ToString))
+				End If
 			End If
-#End If
 
 		End If
 
-#If TRACE Then
-		Trace.Unindent()
-#End If
+		If dotrace Then
+			Trace.Unindent()
+		End If
 		Return stringClean
 	End Function
 
@@ -15229,7 +15278,7 @@ saveImage:
 
 
 
-	Private Sub CustomSlideshowTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CustomSlideshowTimer.Tick
+	Private Sub CustomSlideshowTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs, Optional ByVal IsRandom As Boolean = True) Handles CustomSlideshowTimer.Tick
 		If FrmSettings.CBSettingsPause.Checked = True And FrmSettings.SettingsPanel.Visible = True Then Return
 		Try
 			Dim sw As New Stopwatch
@@ -15245,8 +15294,21 @@ restartInstantly:
 			' Determine if local images are preferred .
 			Dim PreferOffline As Boolean = If(CustomSlideshowTimer.Interval < 1000, True, False)
 
-			' Display a random image.
-			ShowImage(ssh.CustomSlideshow.GetRandom(PreferOffline), True)
+			Dim i As Integer = 0
+			Do While i <= 10
+				' Display a random image.
+				'ShowImage(ssh.CustomSlideshow.GetRandom(PreferOffline), True)
+
+				If IsRandom Then
+					If (ShowImage(ssh.CustomSlideshow.GetRandom(PreferOffline), True)) Then
+						Exit Do
+					End If
+				ElseIf (ShowImage(ssh.CustomSlideshow.NextImage(), True)) Then
+					Exit Do
+				End If
+				i = i + 1
+			Loop
+
 
 			' If displaying the image took longer as the interval, restart instantly.
 			If sw.ElapsedMilliseconds > CustomSlideshowTimer.Interval Then GoTo restartInstantly
@@ -17418,7 +17480,7 @@ ReRoll:
 
 #Region "------------------------------------------------------ Lazy-Sub ------------------------------------------------------"
 
-	Private Sub Button25_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BTNStop.Click, Button7.Click
+	Private Sub BtnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BTNStop.Click, Button7.Click
 		chatBox.Text = "Let me stop"
 		sendButton.PerformClick()
 	End Sub
@@ -19199,6 +19261,10 @@ ShowedBlogImage:
 		LBLWritingTaskText.Text = StripFormat(LBLWritingTaskText.Text)
 		LBLWritingTaskText.Text = LBLWritingTaskText.Text.Replace("  ", " ")
 		LBLWritingTaskText.Text = LBLWritingTaskText.Text.Trim
+	End Sub
+
+	Private Sub LoadCustomizedSlideshow(sender As Object, e As KeyEventArgs)
+
 	End Sub
 End Class
 

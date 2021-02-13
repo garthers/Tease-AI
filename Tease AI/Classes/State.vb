@@ -525,7 +525,14 @@ Public Class SessionState
 
 	Public Property VideoGenre As String
 
-
+	Public Property StrokeCounter As Integer
+	<Category("Video")>
+	Public Property JumpPercentVid As Integer
+	<Category("Video")>
+	Public Property JumpPercentAudio As Integer
+	<Category("Images")>
+	Public Property SlideshowMasterDomme As ContactData
+	Public Property StrokePaceMem As Integer
 #Region "----------------------------------- Only for Serialization -------------------------------------"
 
 #Region "----------------------------------------- Form1.WMP --------------------------------------------"

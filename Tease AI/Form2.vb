@@ -382,6 +382,9 @@ Public Class FrmSettings
 		degradingCheckBox.Checked = My.Settings.DomDegrading
 		CFNMCheckBox.Checked = My.Settings.DomCFNM
 		CBRandomDomme.Checked = My.Settings.CBRandomDomme
+		CBRandomGlitter.Checked = My.Settings.CBRandomGlitter
+		CBAutoDomPP.Checked = My.Settings.CBAutoDomPP
+
 		CBOutputErrors.Checked = My.Settings.CBOutputErrors
 		alwaysNewSlideshow.Checked = My.Settings.AlwaysNewSlideshow
 		giveupCheckBox.Checked = My.Settings.GiveUpReturn
@@ -413,7 +416,7 @@ Public Class FrmSettings
 		WBPlaylist.Navigate(Application.StartupPath & "\Scripts\" & Form1.dompersonalitycombobox.Text & "\Playlist\Start\")
 
 
-		For Each tmptbx As TextBox In New List(Of TextBox) From {TbxContact1ImageDir, TbxContact2ImageDir, TbxContact3ImageDir, TbxDomImageDir}
+		For Each tmptbx As TextBox In New List(Of TextBox) From {TbxContact1ImageDir, TbxContact2ImageDir, TbxContact3ImageDir, TbxDomImageDir, TbxDomImageDirRand}
 			If tmptbx.DataBindings("Text") Is Nothing Then
 				Throw New Exception("There is no databinding set on """ & tmptbx.Name &
 				 """'s text-property. Set the databinding and recompile!")
@@ -428,7 +431,7 @@ Public Class FrmSettings
 		Next
 
 		TbxRandomImageDir.Text = My.Settings.RandomImageDir
-
+		Form1.CheckRandomOpportunities()
 		If My.Settings.TeaseAILanguage = "English" Then EnglishMenu()
 		If My.Settings.TeaseAILanguage = "German" Then GermanMenu()
 
@@ -2807,6 +2810,7 @@ SkipDeserializing:
 			My.Settings.RandomImageDir = FolderBrowserDialog1.SelectedPath
 			My.Application.Session.SlideshowContactRandom = New ContactData(ContactType.Random)
 			TbxRandomImageDir.Text = My.Settings.RandomImageDir
+			Form1.CheckRandomOpportunities()
 		End If
 	End Sub
 
@@ -3214,6 +3218,10 @@ SkipDeserializing:
 
 			' Set the resized image as picturebox image and write it to disk
 			target.Image = ResizeImage(filepath, New Size(138, 179))
+			If Not Directory.GetParent(savePath).Exists Then
+				Directory.GetParent(savePath).Create()
+			End If
+
 			target.Image.Save(savePath)
 
 			' Set the image Location-Property. Property has to be databound with My.Settings!
@@ -9386,10 +9394,14 @@ checkFolder:
 		CBSlideshowRandom.Text = "Display Slideshow Pictures Randomly"
 		landscapeCheckBox.Text = "Stretch Landscape Images"
 		CBImageInfo.Text = "Display Image Information"
+		CBAutoDomPP.Text = "Automatic Domme Profil Picture"
+		CBRandomGlitter.Text = "Always Start with Random Glitter"
+		CBRandomDomme.Text = "Always Start with Random Domme"
+		CBImageInfo.Text = "Display Image Information"
 
 		GBDommeImages.Text = "Slideshow Options"
-		BTNDomImageDir.Text = "Set Domme Images Directory"
-
+		BTNDomImageDir.Text = "Set Domme Slideshow Images Directory"
+		BTNDomImageDirRand.Text = "Set Domme Random Images Directory"
 		'GBSlideshowOptions.Text = "Slideshow Options"
 		offRadio.Text = "Manual"
 		teaseRadio.Text = "Tease"
@@ -10311,4 +10323,29 @@ checkFolder:
 
 	End Sub
 
+	Private Sub CBAutoDomPP_CheckedChanged(sender As Object, e As EventArgs) Handles CBAutoDomPP.CheckedChanged
+		My.Settings.CBAutoDomPP = CBAutoDomPP.Checked
+	End Sub
+
+	Private Sub CBAutoDomPP_MouseHover(sender As Object, e As EventArgs) Handles CBAutoDomPP.MouseHover
+		TTDir.SetToolTip(CBAutoDomPP, "When this is selected, the profil picture of the domme is automatically replaced" + Environment.NewLine + " at the beginning of the session with a random picture from the current slideshow")
+	End Sub
+
+	Private Sub CBRandomGlitter_MouseHover(sender As Object, e As EventArgs) Handles CBRandomGlitter.MouseHover
+		TTDir.SetToolTip(CBRandomGlitter, "When this is selected, All Glitter contacts are randomly selected in the domme folder" + Environment.NewLine + " You must have at least 4 domme in your domme folder to select this option")
+	End Sub
+
+	Private Sub BTNDomImageDirRand_MouseHover(sender As Object, e As EventArgs) Handles BTNDomImageDirRand.MouseHover
+		TTDir.SetToolTip(BTNDomImageDirRand, "Use this button to select a directory containing several images" + Environment.NewLine + "set folders of the same model you're using as your domme." + Environment.NewLine + Environment.NewLine + "This directory will be used sometimes by the domme to show random pictures of her")
+	End Sub
+
+	Private Sub CBRandomGlitter_CheckedChanged(sender As Object, e As EventArgs) Handles CBRandomGlitter.CheckedChanged
+		My.Settings.CBRandomGlitter = CBRandomGlitter.Checked
+	End Sub
+
+	Private Sub BTNDomImageDirRand_Click(sender As Object, e As EventArgs) Handles BTNDomImageDirRand.Click
+		If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
+			My.Settings.DomImageDirRand = FolderBrowserDialog1.SelectedPath
+		End If
+	End Sub
 End Class

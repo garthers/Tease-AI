@@ -497,7 +497,7 @@
     <Setting Name="CBUseHonor" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-	<Setting Name="CBUseName" Type="System.Boolean" Scope="User">
+    <Setting Name="CBUseName" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="CBCapHonor" Type="System.Boolean" Scope="User">
@@ -1178,9 +1178,6 @@
     <Setting Name="CBDateTransparent" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="SplitterPosition" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">498</Value>
-    </Setting>
     <Setting Name="MirrorWindows" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -1466,6 +1463,18 @@
     </Setting>
     <Setting Name="CbChatDisplayWarnings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DomImageDirRand" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="CBAutoDomPP" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SplitterPosition" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">813</Value>
+    </Setting>
+    <Setting Name="CBRandomGlitter" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -259,16 +259,64 @@ checkFolder:
 		If Directory.Exists(baseDirectory) = False Then _
 			Throw New DirectoryNotFoundException("The given slideshow base diretory """ & baseDirectory & """ was not found.")
 	Dim currPath As String
-
+#If False Then
+					string currPath = "";
+			currPath = ((!(Contact == ContactType.Random && !newFolder)) ? baseDirectory : (tempBaseFolder = myDirectory.GetDirectories(baseDirectory).ElementAt(MyProject.Forms.Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count()))));
+			while ((currPath.Contains("#Contact") & (Contact == ContactType.Random)) | (currPath.Contains(MyProject.Forms.FrmSettings.TbxDomImageDir.Text) & (Contact == ContactType.Random)))
+			{
+				currPath = ((!(Contact == ContactType.Random && !newFolder)) ? baseDirectory : (tempBaseFolder = myDirectory.GetDirectories(baseDirectory).ElementAt(MyProject.Forms.Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count()))));
+			}
+			List<string> subDirs = myDirectory.GetDirectories(currPath).ToList();
+			if (subDirs.Contains(MySettingsProperty.Settings.DomImageDirRand))
+			{
+				subDirs.Remove(MySettingsProperty.Settings.DomImageDirRand);
+			}
+			List<string> dirListToExclude = new List<string>();
+			foreach (string tempDir in subDirs)
+			{
+				if (Operators.CompareString(Conversions.ToString(tempDir.Substring(checked(tempDir.LastIndexOf("\\") + 1)).ElementAt(0)), "#", TextCompare: false) == 0)
+				{
+					dirListToExclude.Add(tempDir);
+				}
+			}
+			foreach (string tempDir in dirListToExclude)
+			{
+				subDirs.Remove(tempDir);
+			}
+#End If
 		If Contact = ContactType.Random And Not newFolder Then
 			currPath = myDirectory.GetDirectories(baseDirectory).ElementAt(Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count))
 			tempBaseFolder = currPath
 		Else
 			currPath = baseDirectory
 		End If
+		While currPath.Contains("#Contact") AndAlso Contact = ContactType.Random OrElse currPath.Contains(FrmSettings.TbxDomImageDir.Text) AndAlso Contact = ContactType.Random
+			If Contact = ContactType.Random And Not newFolder Then
+				currPath = myDirectory.GetDirectories(baseDirectory).ElementAt(Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count))
+				tempBaseFolder = currPath
+			Else
+				currPath = baseDirectory
+			End If
+		End While
+		Dim subDirs As List(Of String) = myDirectory.GetDirectories(currPath).ToList()
+		If subDirs.Contains(My.Settings.DomImageDirRand) Then
+			subDirs.Remove(My.Settings.DomImageDirRand)
+		End If
+		Dim dirListToExclude As New List(Of String)
+		For Each tempDir As String In subDirs
+			If tempDir.Substring(tempDir.LastIndexOf("\\") + 1).StartsWith("#") Then
+				dirListToExclude.Add(tempDir)
+			End If
+		Next
+		For Each tempDir As String In dirListToExclude
+			subDirs.Remove(tempDir)
+		Next
+
+
+
 
 		' Read all subdirectories in base folder.
-		Dim subDirs As List(Of String) = myDirectory.GetDirectories(currPath).ToList
+		subDirs = myDirectory.GetDirectories(currPath).ToList
 		Dim exclude As New List(Of String)
 nextSubDir:
 		' Check if there are folders left.
@@ -394,7 +442,7 @@ nextSubDir:
 			Return String.Empty
 		ElseIf Index >= ImageList.Count - 1 AndAlso My.Settings.CBNewSlideshow Then
 			' End of Slideshow load new one
-			LoadNew(False)
+			LoadNew(My.Settings.CBRandomDomme)
 		ElseIf Index >= ImageList.Count - 1 Then
 			' End of Slideshow return last image
 			Index = ImageList.Count - 1
@@ -418,7 +466,7 @@ nextSubDir:
 			If Index < 0 Then Index = 0
 		ElseIf Index >= ImageList.Count - 1 AndAlso My.Settings.CBNewSlideshow Then
 			' End of Slideshow start new
-			LoadNew(False)
+			LoadNew(My.Settings.CBRandomDomme)
 		ElseIf Index >= ImageList.Count - 1 Then
 			' End of Slideshow return last
 			Index = ImageList.Count - 1

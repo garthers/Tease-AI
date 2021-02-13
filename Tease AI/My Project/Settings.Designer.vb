@@ -4754,18 +4754,6 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("498")>  _
-        Public Property SplitterPosition() As Integer
-            Get
-                Return CType(Me("SplitterPosition"),Integer)
-            End Get
-            Set
-                Me("SplitterPosition") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property MirrorWindows() As Boolean
             Get
@@ -5901,6 +5889,54 @@ Namespace My
             End Get
             Set
                 Me("CbChatDisplayWarnings") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property DomImageDirRand() As String
+            Get
+                Return CType(Me("DomImageDirRand"),String)
+            End Get
+            Set
+                Me("DomImageDirRand") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property CBAutoDomPP() As Boolean
+            Get
+                Return CType(Me("CBAutoDomPP"),Boolean)
+            End Get
+            Set
+                Me("CBAutoDomPP") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("807")>  _
+        Public Property SplitterPosition() As Integer
+            Get
+                Return CType(Me("SplitterPosition"),Integer)
+            End Get
+            Set
+                Me("SplitterPosition") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property CBRandomGlitter() As Boolean
+            Get
+                Return CType(Me("CBRandomGlitter"),Boolean)
+            End Get
+            Set
+                Me("CBRandomGlitter") = value
             End Set
         End Property
     End Class
