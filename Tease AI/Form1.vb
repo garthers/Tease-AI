@@ -220,6 +220,21 @@ Public Class Form1
 	End Sub
 
 
+	Public Function LoadRandomFolder(ByVal baseDirectory As String) As String
+		If Not Directory.Exists(baseDirectory) Then
+			Throw New DirectoryNotFoundException("The given slideshow base diretory \"" + baseDirectory + " \ " was not found.")
+		End If
+		Dim subDirs As List(Of String) = myDirectory.GetDirectories(myDirectory.GetDirectories(baseDirectory).ElementAt(ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count()))).ToList()
+		Dim rndFolder As String = Nothing
+		Do
+			rndFolder = subDirs(ssh.randomizer.Next(0, subDirs.Count))
+			If myDirectory.GetFilesImages(rndFolder, System.IO.SearchOption.TopDirectoryOnly).Count > 0 Then
+				Exit Do
+			End If
+			subDirs.Remove(rndFolder)
+		Loop
+		Return rndFolder
+	End Function
 	Public Sub CheckRandomOpportunities()
 		Dim randomDir As DirectoryInfo = Nothing
 
@@ -518,6 +533,9 @@ retryStart:
 				FrmSettings.CBImageInfo.Checked = False
 			End If
 
+			FrmSettings.CBAutoDomPP.Checked = My.Settings.CBAutoDomPP
+			FrmSettings.CBRandomGlitter.Checked = My.Settings.CBRandomGlitter
+
 			FrmSplash.UpdateText("Loading Domme settings...")
 
 			FrmSettings.domageNumBox.Value = My.Settings.DomAge
@@ -745,6 +763,13 @@ retryStart:
 			FrmSplash.UpdateText("Configuring media player...")
 
 			DomWMP.uiMode = "none"
+			DomWMP.settings.volume = 100
+			contextWMP.Visible = False
+			contextWMP.uiMode = "none"
+			contextWMP.settings.volume = 100
+			voiceDomWMP.Visible = False
+			voiceDomWMP.uiMode = "none"
+			voiceDomWMP.settings.volume = 100
 
 			If My.Settings.DomAVStretch = False Then domAvatar.SizeMode = PictureBoxSizeMode.Zoom
 			'If My.Settings.SubAvStretch = False Then subAvatar.SizeMode = PictureBoxSizeMode.Zoom
@@ -1166,6 +1191,7 @@ retryStart:
 				If TaskList.Count > 0 Then
 					If Directory.Exists(My.Settings.DomImageDir) And ssh.SlideshowLoaded = False Then
 						LoadDommeImageFolder()
+						InitDommeImageFolder()
 					End If
 					ssh.BeforeTease = True
 					ssh.SaidHello = True
@@ -1192,6 +1218,7 @@ retryStart:
 
 			If checkSubAnswer("hi") = 1 Then
 				Debug.Print("CHeck")
+				RefreshRandomize()
 				ssh.justStarted = True
 				ssh.SaidHello = True
 				ssh.BeforeTease = True
@@ -1284,6 +1311,7 @@ NoPlaylistStartFile:
 				If Directory.Exists(My.Settings.DomImageDir) And ssh.SlideshowLoaded = False Then
 					If FrmSettings.CBRandomDomme.Checked = True Then ssh.glitterDommeNumber = 4
 					LoadDommeImageFolder()
+					InitDommeImageFolder()
 				End If
 
 
@@ -1482,7 +1510,7 @@ WritingTaskLine:
 
 			If ssh.TauntEdging = True And ssh.SubEdging = False And ssh.ShowModule = False Then
 				ssh.DomChat = "#SYS_TauntEdgingAsked"
-				TypingDelay()
+				TypingNoDelay()
 
 				' Recalculate TantEdging-Chance
 				If ssh.randomizer.Next(1, 101) <= FrmSettings.NBTauntEdging.Value Then
@@ -1586,7 +1614,7 @@ WritingTaskLine:
 						If ssh.Contact1Edge = True Then ssh.DomChat = "@Contact1 #SYS_MultipleEdgesStop"
 						If ssh.Contact2Edge = True Then ssh.DomChat = "@Contact2 #SYS_MultipleEdgesStop"
 						If ssh.Contact3Edge = True Then ssh.DomChat = "@Contact3 #SYS_MultipleEdgesStop"
-						TypingDelay()
+						TypingNoDelay()
 						ssh.MultipleEdgesTick = ssh.MultipleEdgesInterval
 						MultipleEdgesTimer.Start()
 						ssh.MultipleEdgesMetronome = "STOP"
@@ -1675,7 +1703,7 @@ WritingTaskLine:
 						ssh.DomChat = "@Contact3 #HoldTheEdge"
 						' github patch Contact3Edge = False
 					End If
-					TypingDelay()
+					TypingNoDelay()
 
 
 					If ssh.EdgeHoldFlag = False Then
@@ -1815,7 +1843,7 @@ NoRepeatFiles:
 						ssh.DomChat = "@Contact3 #StopStrokingEdge"
 						ssh.Contact3Edge = False
 					End If
-					TypingDelay()
+					TypingNoDelay()
 					Return
 
 				End If
@@ -1903,7 +1931,7 @@ NoRepeatRFiles:
 					ssh.DomChat = "@Contact3 #RuinYourOrgasm"
 					ssh.Contact3Edge = False
 				End If
-				TypingDelay()
+				TypingNoDelay()
 				If ssh.LastScript = True Then ssh.EndTease = True
 				Return
 
@@ -2029,7 +2057,7 @@ NoRepeatOFiles:
 					ssh.DomChat = "@Contact3 #CumForMe"
 					ssh.Contact3Edge = False
 				End If
-				TypingDelay()
+				TypingNoDelay()
 				If ssh.LastScript = True Then ssh.EndTease = True
 				Return
 
@@ -2067,7 +2095,7 @@ NoRepeatOFiles:
 							ssh.DomChat = "@Contact3 #StopStrokingEdge"
 							ssh.Contact3Edge = False
 						End If
-						TypingDelay()
+						TypingNoDelay()
 
 						Do
 							Application.DoEvents()
@@ -2576,7 +2604,7 @@ FoundResponse:
 			If FrmSettings.SliderSTF.Value = 2 Then ssh.StrokeTauntTick = ssh.randomizer.Next(75, 121)
 			If FrmSettings.SliderSTF.Value = 3 Then ssh.StrokeTauntTick = ssh.randomizer.Next(45, 76)
 			If FrmSettings.SliderSTF.Value = 4 Then ssh.StrokeTauntTick = ssh.randomizer.Next(25, 46)
-			If FrmSettings.SliderSTF.Value = 5 Then ssh.StrokeTauntTick = ssh.randomizer.Next(15, 26)
+			If FrmSettings.SliderSTF.Value = 5 Then ssh.StrokeTauntTick = ssh.randomizer.Next(10, 24)
 		End If
 
 		ssh.DomChat = ResponseClean(ssh.DomChat)
@@ -3712,6 +3740,13 @@ CancelGoto:
 
 	End Sub
 
+	Public Sub TypingNoDelay()
+		If My.Settings.OfflineMode Then
+			ssh.DomChat = OfflineConversion(ssh.DomChat)
+		End If
+		ssh.TypeDelay = 0
+		SendTimer.Start()
+	End Sub
 	Public Sub TypingDelay()
 
 		'Debug.Print("Typing Delay Called " & StrokeTauntVal)
@@ -3719,18 +3754,12 @@ CancelGoto:
 			ssh.DomChat = OfflineConversion(ssh.DomChat)
 		End If
 		ssh.TypeDelay = ssh.StringLength
-		If FrmSettings.typeinstantlyCheckBox.Checked = True Or ssh.RapidCode = True = True Then ssh.TypeDelay = 0
+		If FrmSettings.typeinstantlyCheckBox.Checked OrElse ssh.RapidCode OrElse ssh.RapidFire Then ssh.TypeDelay = 0
 		If ssh.TypeDelay <> 0 Then
-			If GetCharCount(ssh.DomChat, "@RT(") <> 0 Then
-				ssh.TypeDelay /= GetCharCount(ssh.DomChat, ",") + 1
-				ssh.TypeDelay *= GetSubstringCount(ssh.DomChat, "@RT(")
-			End If
-			If GetCharCount(ssh.DomChat, "@RandomText(") <> 0 Then
-				ssh.TypeDelay /= GetCharCount(ssh.DomChat, ",") + 1
-				ssh.TypeDelay *= GetSubstringCount(ssh.DomChat, "@RandomText(")
-			End If
+			ssh.TypeDelay /= 2
+			If ssh.TypeDelay > 6 Then ssh.TypeDelay = 6
 		End If
-		If ssh.TypeDelay > 60 Then ssh.TypeDelay = 60
+
 		SendTimer.Start()
 
 
@@ -3742,21 +3771,15 @@ CancelGoto:
 			ssh.DomTask = OfflineConversion(ssh.DomTask)
 		End If
 		ssh.TypeDelay = ssh.StringLength
-		If FrmSettings.typeinstantlyCheckBox.Checked = True Or ssh.RapidCode = True = True Then ssh.TypeDelay = 0
-		If ssh.HypnoGen = True And CBHypnoGenNoText.Checked = True Then ssh.TypeDelay = 0
+		If FrmSettings.typeinstantlyCheckBox.Checked OrElse ssh.RapidCode OrElse ssh.RapidFire Then ssh.TypeDelay = 0
+		If ssh.HypnoGen AndAlso CBHypnoGenNoText.Checked Then ssh.TypeDelay = 0
 		If ssh.TypeDelay <> 0 Then
-			If GetCharCount(ssh.DomTask, "@RT(") <> 0 Then
-				ssh.TypeDelay /= GetCharCount(ssh.DomTask, ",") + 1
-				ssh.TypeDelay *= GetSubstringCount(ssh.DomTask, "@RT(")
-			End If
-			If GetCharCount(ssh.DomTask, "@RandomText(") <> 0 Then
-				ssh.TypeDelay /= GetCharCount(ssh.DomTask, ",") + 1
-				ssh.TypeDelay *= GetSubstringCount(ssh.DomTask, "@RandomText(")
+			ssh.TypeDelay /= 2.5
+			If ssh.TypeDelay > 4 Then
+				ssh.TypeDelay = 4
 			End If
 		End If
-		If ssh.TypeDelay > 60 Then ssh.TypeDelay = 60
 		Timer1.Start()
-
 	End Sub
 
 	Private Sub Timer1_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer1.Tick
@@ -3834,7 +3857,7 @@ SkipIsTyping:
 					ssh.DivideText = False
 				End If
 				If ssh.RLGLGame = True Then ssh.StringLength = 0
-				If FrmSettings.typeinstantlyCheckBox.Checked = True Or ssh.RapidCode = True Then ssh.StringLength = 0
+				If FrmSettings.typeinstantlyCheckBox.Checked OrElse ssh.RapidCode OrElse ssh.RapidFire Then ssh.StringLength = 0
 				If ssh.HypnoGen = True And CBHypnoGenNoText.Checked = True Then ssh.StringLength = 0
 				TypingDelayGeneric()
 			End If
@@ -3885,13 +3908,13 @@ SkipIsTyping:
 				If ssh.DomTask.Contains("@SlideshowLast") Then ssh.JustShowedSlideshowImage = True
 
 
-				If ssh.GlitterTease = True And ssh.JustShowedBlogImage = False And ssh.LockImage = False Then GoTo TryNextWithTease
+				If ssh.GlitterTease AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.LockImage Then GoTo TryNextWithTease
 
 
-				If FrmSettings.teaseRadio.Checked = True And ssh.JustShowedBlogImage = False And ssh.TeaseVideo = False And Not ssh.DomTask.Contains("@NewBlogImage") And ssh.NullResponse = False _
-				  And ssh.SlideshowLoaded = True And Not ssh.DomTask.Contains("@ShowButtImage") And Not ssh.DomTask.Contains("@ShowBoobsImage") And Not ssh.DomTask.Contains("@ShowButtsImage") _
-				  And Not ssh.DomTask.Contains("@ShowBoobsImage") And ssh.LockImage = False And ssh.CustomSlideEnabled = False And ssh.RapidFire = False _
-				  And UCase(ssh.DomTask) <> "@SystemMessage Tease AI has been reset" And ssh.JustShowedSlideshowImage = False And ssh.MultiTauntPictureHold = False Then
+				If FrmSettings.teaseRadio.Checked AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.TeaseVideo = False AndAlso Not ssh.DomTask.Contains("@NewBlogImage") AndAlso Not ssh.NullResponse _
+				  AndAlso ssh.SlideshowLoaded AndAlso Not ssh.DomTask.Contains("@ShowButtImage") AndAlso Not ssh.DomTask.Contains("@ShowBoobsImage") AndAlso Not ssh.DomTask.Contains("@ShowButtsImage") _
+				  AndAlso Not ssh.DomTask.Contains("@ShowBoobsImage") AndAlso Not ssh.LockImage AndAlso Not ssh.CustomSlideEnabled AndAlso Not ssh.RapidFire _
+				  AndAlso UCase(ssh.DomTask) <> "@SystemMessage Tease AI has been reset" AndAlso Not ssh.JustShowedSlideshowImage AndAlso Not ssh.MultiTauntPictureHold Then
 					' Begin Next Button
 					' @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 TryNextWithTease:
@@ -3947,7 +3970,7 @@ NullResponse:
 				' Set LineSpeaker for typo corrections.
 				Dim LineSpeaker As String = ""
 
-				If ssh.dommePresent Then
+				If ssh.dommePresent AndAlso Not ssh.contactToUse Is Nothing Then
 					If ssh.contactToUse.Equals(ssh.SlideshowContact1) Then
 						LineSpeaker = "@Contact1 "
 					ElseIf ssh.contactToUse.Equals(ssh.SlideshowContact2) Then
@@ -4092,106 +4115,107 @@ NullResponse:
 
 
 					'Typo Test
+					If FrmSettings.NBTypoChance.Value > 0 Then
+						Try
 
-					Try
+							Dim RestoreDomTask As String = ssh.DomTask
 
-						Dim RestoreDomTask As String = ssh.DomTask
-
-						If Not ssh.DomTask.Substring(0, 1) = FrmSettings.TBEmote.Text.Substring(0, 1) And Not ssh.DomTask.Contains("<") And ssh.YesOrNo = False And ssh.TypoSwitch <> 0 And ssh.TyposDisabled = False _
+							If Not ssh.DomTask.Substring(0, 1) = FrmSettings.TBEmote.Text.Substring(0, 1) And Not ssh.DomTask.Contains("<") And ssh.YesOrNo = False And ssh.TypoSwitch <> 0 And ssh.TyposDisabled = False _
 						  And FrmSettings.TTSCheckBox.Checked = False Then
 
-							Dim TypoChance As Integer = ssh.randomizer.Next(0, 101)
+								Dim TypoChance As Integer = ssh.randomizer.Next(0, 101)
 
-							If TypoChance < FrmSettings.NBTypoChance.Value Or ssh.TypoSwitch = 2 Then
+								If TypoChance < FrmSettings.NBTypoChance.Value Or ssh.TypoSwitch = 2 Then
 
-								Try
+									Try
 
-									Dim TypoString As String
+										Dim TypoString As String
 
-									Dim TypoSplit As String() = ssh.DomTask.Split(" ")
+										Dim TypoSplit As String() = ssh.DomTask.Split(" ")
 
-									ssh.TempVal = ssh.randomizer.Next(0, TypoSplit.Count)
+										ssh.TempVal = ssh.randomizer.Next(0, TypoSplit.Count)
 
-									ssh.CorrectedWord = TypoSplit(ssh.TempVal)
+										ssh.CorrectedWord = TypoSplit(ssh.TempVal)
 
-									ssh.CorrectedWord = ssh.CorrectedWord.Replace(",", "")
-									ssh.CorrectedWord = ssh.CorrectedWord.Replace(".", "")
-									ssh.CorrectedWord = ssh.CorrectedWord.Replace("!", "")
-									ssh.CorrectedWord = ssh.CorrectedWord.Replace("?", "")
+										ssh.CorrectedWord = ssh.CorrectedWord.Replace(",", "")
+										ssh.CorrectedWord = ssh.CorrectedWord.Replace(".", "")
+										ssh.CorrectedWord = ssh.CorrectedWord.Replace("!", "")
+										ssh.CorrectedWord = ssh.CorrectedWord.Replace("?", "")
 
-									TypoString = "w d s f x"
-
-
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "a" Then TypoString = "q w s z x"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "b" Then TypoString = "f v g h n"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "c" Then TypoString = "x d f v b"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "d" Then TypoString = "s c f x e"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "e" Then TypoString = "s r w 3 d"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "f" Then TypoString = "d r g v c"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "g" Then TypoString = "f t b h y"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "h" Then TypoString = "g b n u j"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "i" Then TypoString = "o u j k l"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "j" Then TypoString = "k u i n h"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "k" Then TypoString = "j m , l i"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "l" Then TypoString = "; p . , i"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "m" Then TypoString = "n j k , l"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "n" Then TypoString = "b h j k m"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "o" Then TypoString = "p 0 i k ;"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "p" Then TypoString = "[ - o ; l"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "q" Then TypoString = "1 w s a 2"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "r" Then TypoString = "4 5 t f d"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "s" Then TypoString = "w d a z x"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "t" Then TypoString = "5 6 g y r"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "u" Then TypoString = "y 7 j i k"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "v" Then TypoString = "c f g h b"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "w" Then TypoString = "2 a e q s"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "x" Then TypoString = "z s d f c"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "y" Then TypoString = "t 7 h u g"
-									If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "z" Then TypoString = "a s x d c"
+										TypoString = "w d s f x"
 
 
-									Dim UpperChance As Integer = ssh.randomizer.Next(0, 101)
-									If UpperChance < 26 Then TypoString = UCase(TypoString)
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "a" Then TypoString = "q w s z x"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "b" Then TypoString = "f v g h n"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "c" Then TypoString = "x d f v b"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "d" Then TypoString = "s c f x e"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "e" Then TypoString = "s r w 3 d"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "f" Then TypoString = "d r g v c"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "g" Then TypoString = "f t b h y"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "h" Then TypoString = "g b n u j"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "i" Then TypoString = "o u j k l"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "j" Then TypoString = "k u i n h"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "k" Then TypoString = "j m , l i"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "l" Then TypoString = "; p . , i"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "m" Then TypoString = "n j k , l"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "n" Then TypoString = "b h j k m"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "o" Then TypoString = "p 0 i k ;"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "p" Then TypoString = "[ - o ; l"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "q" Then TypoString = "1 w s a 2"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "r" Then TypoString = "4 5 t f d"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "s" Then TypoString = "w d a z x"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "t" Then TypoString = "5 6 g y r"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "u" Then TypoString = "y 7 j i k"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "v" Then TypoString = "c f g h b"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "w" Then TypoString = "2 a e q s"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "x" Then TypoString = "z s d f c"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "y" Then TypoString = "t 7 h u g"
+										If LCase(TypoSplit(ssh.TempVal).Substring(0, 1)) = "z" Then TypoString = "a s x d c"
+
+
+										Dim UpperChance As Integer = ssh.randomizer.Next(0, 101)
+										If UpperChance < 26 Then TypoString = UCase(TypoString)
 
 
 
-									Dim GetTypo As String() = TypoString.Split(" ")
+										Dim GetTypo As String() = TypoString.Split(" ")
 
-									Dim MadeTypo As String = GetTypo(ssh.randomizer.Next(0, GetTypo.Count))
-
-
-									Dim DoubleChance As Integer = ssh.randomizer.Next(0, 101)
-									If DoubleChance < 11 Then MadeTypo = MadeTypo & LCase(GetTypo(ssh.randomizer.Next(0, GetTypo.Count)))
+										Dim MadeTypo As String = GetTypo(ssh.randomizer.Next(0, GetTypo.Count))
 
 
-									TypoSplit(ssh.TempVal) = TypoSplit(ssh.TempVal).Remove(0, 1)
+										Dim DoubleChance As Integer = ssh.randomizer.Next(0, 101)
+										If DoubleChance < 11 Then MadeTypo = MadeTypo & LCase(GetTypo(ssh.randomizer.Next(0, GetTypo.Count)))
 
-									Dim SpaceChance As Integer = ssh.randomizer.Next(0, 101)
-									If SpaceChance < 7 Then
-										TypoSplit(ssh.TempVal) = MadeTypo & " " & TypoSplit(ssh.TempVal)
-									Else
-										TypoSplit(ssh.TempVal) = MadeTypo & TypoSplit(ssh.TempVal)
 
-									End If
+										TypoSplit(ssh.TempVal) = TypoSplit(ssh.TempVal).Remove(0, 1)
 
-									ssh.DomTask = Join(TypoSplit)
+										Dim SpaceChance As Integer = ssh.randomizer.Next(0, 101)
+										If SpaceChance < 7 Then
+											TypoSplit(ssh.TempVal) = MadeTypo & " " & TypoSplit(ssh.TempVal)
+										Else
+											TypoSplit(ssh.TempVal) = MadeTypo & TypoSplit(ssh.TempVal)
 
-									ssh.CorrectedTypo = True
+										End If
 
-								Catch
+										ssh.DomTask = Join(TypoSplit)
 
-									ssh.DomTask = RestoreDomTask
-									ssh.CorrectedTypo = False
-								End Try
+										ssh.CorrectedTypo = True
+
+									Catch
+
+										ssh.DomTask = RestoreDomTask
+										ssh.CorrectedTypo = False
+									End Try
+
+								End If
 
 							End If
 
-						End If
+							ssh.TypoSwitch = 1
 
-						ssh.TypoSwitch = 1
-
-					Catch
-					End Try
+						Catch
+						End Try
+					End If
 
 
 				End If
@@ -4608,7 +4632,7 @@ SkipIsTyping:
 					ssh.StringLength /= 3
 					ssh.DivideText = False
 				End If
-				If FrmSettings.typeinstantlyCheckBox.Checked = True Or ssh.RapidCode = True Then ssh.StringLength = 0
+				If FrmSettings.typeinstantlyCheckBox.Checked OrElse ssh.RapidCode OrElse ssh.RapidFire Then ssh.StringLength = 0
 				TypingDelay()
 			End If
 
@@ -5563,7 +5587,7 @@ Retry:
 				' Increase chance of one line taunt
 				Dim OneLineChance As Integer = ssh.randomizer.Next(0, 101)
 
-				If OneLineChance < 45 _
+				If OneLineChance < 60 _
 				AndAlso TauntFiles.Find(Function(x) x.TauntSize = 1) IsNot Nothing Then
 					' 1 line taunts available, force to use it.
 					Dim OneLiners As List(Of TauntProcessingObject) = TauntFiles.Where(Function(x) x.TauntSize = 1).ToList
@@ -5623,8 +5647,8 @@ Retry:
 			If FrmSettings.SliderSTF.Value = 1 Then ssh.StrokeTauntTick = ssh.randomizer.Next(120, 241)
 			If FrmSettings.SliderSTF.Value = 2 Then ssh.StrokeTauntTick = ssh.randomizer.Next(75, 121)
 			If FrmSettings.SliderSTF.Value = 3 Then ssh.StrokeTauntTick = ssh.randomizer.Next(45, 76)
-			If FrmSettings.SliderSTF.Value = 4 Then ssh.StrokeTauntTick = ssh.randomizer.Next(25, 46)
-			If FrmSettings.SliderSTF.Value = 5 Then ssh.StrokeTauntTick = ssh.randomizer.Next(15, 26)
+			If FrmSettings.SliderSTF.Value = 4 Then ssh.StrokeTauntTick = ssh.randomizer.Next(19, 46)
+			If FrmSettings.SliderSTF.Value = 5 Then ssh.StrokeTauntTick = ssh.randomizer.Next(12, 25)
 		Else
 			ssh.StrokeTauntTick = ssh.randomizer.Next(5, 9)
 		End If
@@ -5684,25 +5708,32 @@ Retry:
 		'======================================================================================
 		'									Genre Videos
 		'======================================================================================
-		If My.Settings.CBHardcore = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "HARDCORE") Then _
+		If My.Settings.CBHardcore = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("HARDCORE")) Then _
 		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoHardcore))
 
-		If My.Settings.CBSoftcore = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "SOFTCORE") Then _
+		If My.Settings.CBSoftcore = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("SOFTCORE")) Then _
 		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoSoftcore))
 
-		If My.Settings.CBLesbian = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "LESBIAN") Then _
+		If My.Settings.CBLesbian = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("LESBIAN")) Then _
 		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoLesbian))
 
-		If My.Settings.CBBlowjob = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "BLOWJOB") Then _
+		If My.Settings.CBBlowjob = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("BLOWJOB")) Then _
 		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoBlowjob))
 
-		If My.Settings.CBFemdom = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "FEMDOM") Then _
+		If My.Settings.CBFemdom = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMDOM")) Then _
 		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemdom))
 
-		If My.Settings.CBFemsub = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "FEMSUB") Then _
+		If My.Settings.CBFemsub = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMSUB")) Then _
 		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemsub))
 
+		If My.Settings.CBJOI = True And (ssh.VideoGenre.Contains("JOI")) Then _
+   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOI))
+
+		If My.Settings.CBCH = True And (ssh.VideoGenre.Contains("CH")) Then _
+   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCH))
+
 		If ssh.NoSpecialVideo = True Then GoTo SkipSpecial
+
 
 		If ssh.ScriptVideoTeaseFlag = True Then
 			If ssh.ScriptVideoTease = "Censorship Sucks" Or ssh.ScriptVideoTease = "Avoid The Edge" Or ssh.ScriptVideoTease = "RLGL" Then GoTo SkipSpecial
@@ -5713,38 +5744,38 @@ Retry:
 		'======================================================================================
 		'								Special - Videos
 		'======================================================================================
-		If My.Settings.CBJOI = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "JOI") Then _
+		If My.Settings.CBJOI = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("JOI")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOI))
 
-		If My.Settings.CBCH = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "CH") Then _
+		If My.Settings.CBCH = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("CH")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCH))
 
 SkipSpecial:
 		'======================================================================================
 		'									General Videos
 		'======================================================================================
-		If My.Settings.CBGeneral = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "GENERAL") Then _
+		If My.Settings.CBGeneral = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("GENERAL")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoGeneral))
 
 		'======================================================================================
 		'									Domme - Videos
 		'======================================================================================
-		If My.Settings.CBHardcoreD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "HARDCORE DOMME") Then _
+		If My.Settings.CBHardcoreD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("HARDCORD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoHardcoreD))
 
-		If My.Settings.CBSoftcoreD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "SOFTCORE DOMME") Then _
+		If My.Settings.CBSoftcoreD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("SOFTCORD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoSoftcoreD))
 
-		If My.Settings.CBLesbianD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "LESBIAN DOMME") Then _
+		If My.Settings.CBLesbianD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("LESBIAD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoLesbianD))
 
-		If My.Settings.CBBlowjobD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "BLOWJOB DOMME") Then _
+		If My.Settings.CBBlowjobD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("BLOWJOD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoBlowjobD))
 
-		If My.Settings.CBFemdomD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "FEMDOM DOMME") Then _
+		If My.Settings.CBFemdomD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMDOD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemdomD))
 
-		If My.Settings.CBFemsubD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "FEMSUB DOMME") Then _
+		If My.Settings.CBFemsubD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMSUD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemsubD))
 
 		If ssh.NoSpecialVideo = True Then GoTo SkipSpecialD
@@ -5757,28 +5788,33 @@ SkipSpecial:
 		'======================================================================================
 		'								Domme - Special - Videos
 		'======================================================================================
-		If My.Settings.CBJOID = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "JOI DOMME") Then _
+		If My.Settings.CBJOID = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("JOD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOID))
 
-		If My.Settings.CBCHD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "CH DOMME") Then _
+		If My.Settings.CBCHD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("CD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCHD))
 
 SkipSpecialD:
 		'======================================================================================
 		'								Domme - General Videos
 		'======================================================================================
-		If My.Settings.CBGeneralD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre = "GENERAL DOMME") Then _
+		If My.Settings.CBGeneralD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("GENERAD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoGeneralD))
 
-		ssh.VideoGenre = "ALL"
+		If Not ssh.VideoCheck OrElse ssh.VideoGenre = "" Then
+			ssh.VideoGenre = "ALL"
+		End If
 
-		If __TotalFiles.Count = 0 Then Exit Sub
+		If __TotalFiles.Count = 0 Then
+			ssh.NoVideo = True
+			Exit Sub
+		End If
 
 		If ssh.VideoCheck = True Then Exit Sub
 
 GetAnotherRandomVideo:
 
-		__domVideo = __TotalFiles(__dom.Next(0, __TotalFiles.Count))
+		__domVideo = __TotalFiles(ssh.randomizer.Next(0, __TotalFiles.Count))
 
 		If __domVideo = "" Then GoTo GetAnotherRandomVideo
 
@@ -5941,8 +5977,11 @@ GetAnotherRandomVideo:
 		If FrmSettings.Visible = True Then
 			FrmSettings.Visible = False
 			BtnToggleSettings.Text = "Open Settings Menu"
+			ssh.StrokePace = ssh.StrokePaceMem
 		Else
 			FrmSettings.Visible = True
+			ssh.StrokePaceMem = ssh.StrokePace
+			ssh.StrokePace = 0
 			BtnToggleSettings.Text = "Close Settings Menu"
 		End If
 	End Sub
@@ -7154,24 +7193,238 @@ RinseLatherRepeat:
 			StringClean = StringClean.Replace("@DomTagAny(" & TagFlag & ")", "")
 		End If
 
+		If StringClean.Contains("@DomTagFirst(") Then
+			Dim TagFlag As String = GetParentheses(StringClean, "@DomTagFirst(")
+			' Try to get a Domme Image for the given Tags.
+			'QND-Implemented: ContactData.GetTaggedImage
+			If ssh.contactToUse IsNot Nothing Then
+				ssh.DommeImageSTR = GetLocalImage(TagFlag, True, "First")
+			Else
+				ssh.DommeImageSTR = ""
+			End If
+			StringClean = StringClean.Replace("@DomTagFirst(" & TagFlag & ")", "")
+		End If
+		If StringClean.Contains("@ShowDomRandomImage") AndAlso My.Settings.DomImageDirRand <> "" Then
+			Dim DirDomRandImage As New DirectoryInfo(My.Settings.DomImageDirRand)
+			Dim DirDomRandomDir As New DirectoryInfo(DirDomRandImage.GetDirectories().ElementAt(ssh.randomizer.Next(DirDomRandImage.GetDirectories().Length)).FullName)
+			If ssh.randomizer.Next(10) > 4 Then DirDomRandImage = DirDomRandomDir
+			ShowImage(DirDomRandImage.GetFiles().ElementAt(ssh.randomizer.Next(DirDomRandImage.GetFiles().Length)).FullName, False)
+			StringClean = StringClean.Replace("@ShowDomRandomImage", "")
+		End If
+
+		If StringClean.Contains("#TagGarment") Then
+			Dim tmpString5 As String = "garment"
+			If ssh.DommeImageSTR <> "" Then
+				Dim TagImageFolder5 As String = Directory.GetParent(ssh.DommeImageSTR).FullName
+				If File.Exists(TagImageFolder5 + "\\ImageTags.txt") Then
+
+					Dim TagCheckList5 As New List(Of String)()
+					TagCheckList5 = Common.Txt2List(TagImageFolder5 + "\\ImageTags.txt")
+					TagCheckList5 = StripBlankLines(TagCheckList5)
+
+					For i16 As Integer = 0 To TagCheckList5.Count - 1
+
+						If Not TagCheckList5(i16).Contains(Path.GetFileName(ssh.DommeImageSTR)) OrElse Not TagCheckList5(i16).Contains("TagGarment") Then
+							Continue For
+						End If
+						If TagCheckList5(i16).Contains("TagGarmentCovering") Then
+
+							TagCheckList5(i16) = TagCheckList5(i16).Replace("TagGarmentCovering", "")
+						End If
+						Dim TagSplit5() As String = Strings.Split(TagCheckList5(i16))
+
+						For j6 As Integer = 0 To TagSplit5.Length - 1
+
+							If (TagSplit5(j6).Contains("TagGarment")) Then
+
+								tmpString5 = TagSplit5(j6).Replace("TagGarment", "")
+								Exit For
+							End If
+
+						Next
+					Next
+				End If
+			End If
+			StringClean = StringClean.Replace("#TagGarment", tmpString5)
+		End If
+
+		If StringClean.Contains("#TagUnderwear") Then
+			Dim tmpString5 As String = "underwear"
+			If ssh.DommeImageSTR <> "" Then
+				Dim TagImageFolder5 As String = Directory.GetParent(ssh.DommeImageSTR).FullName
+				If File.Exists(TagImageFolder5 + "\\ImageTags.txt") Then
+
+					Dim TagCheckList5 As New List(Of String)()
+					TagCheckList5 = Common.Txt2List(TagImageFolder5 + "\\ImageTags.txt")
+					TagCheckList5 = StripBlankLines(TagCheckList5)
+
+					For i16 As Integer = 0 To TagCheckList5.Count - 1
+
+						If Not TagCheckList5(i16).Contains(Path.GetFileName(ssh.DommeImageSTR)) OrElse Not TagCheckList5(i16).Contains("TagUnderwear") Then
+							Continue For
+						End If
+
+						Dim TagSplit5() As String = Strings.Split(TagCheckList5(i16))
+
+						For j6 As Integer = 0 To TagSplit5.Length - 1
+
+							If (TagSplit5(j6).Contains("TagUnderwear")) Then
+
+								tmpString5 = TagSplit5(j6).Replace("TagUnderwear", "")
+								Exit For
+							End If
+
+						Next
+					Next
+				End If
+			End If
+			StringClean = StringClean.Replace("#TagUnderwear", tmpString5)
+		End If
+
+		If StringClean.Contains("#TagTatoo") Then
+			Dim tmpString5 As String = "tatoo"
+			If ssh.DommeImageSTR <> "" Then
+				Dim TagImageFolder5 As String = Directory.GetParent(ssh.DommeImageSTR).FullName
+				If File.Exists(TagImageFolder5 + "\\ImageTags.txt") Then
+
+					Dim TagCheckList5 As New List(Of String)()
+					TagCheckList5 = Common.Txt2List(TagImageFolder5 + "\\ImageTags.txt")
+					TagCheckList5 = StripBlankLines(TagCheckList5)
+
+					For i16 As Integer = 0 To TagCheckList5.Count - 1
+
+						If Not TagCheckList5(i16).Contains(Path.GetFileName(ssh.DommeImageSTR)) OrElse Not TagCheckList5(i16).Contains("TagTatoo") Then
+							Continue For
+						End If
+
+						Dim TagSplit5() As String = Strings.Split(TagCheckList5(i16))
+
+						For j6 As Integer = 0 To TagSplit5.Length - 1
+
+							If (TagSplit5(j6).Contains("TagTatoo")) Then
+
+								tmpString5 = TagSplit5(j6).Replace("TagTatoo", "")
+								Exit For
+							End If
+
+						Next
+					Next
+				End If
+			End If
+			StringClean = StringClean.Replace("#TagTatoo", tmpString5)
+		End If
+		If StringClean.Contains("#TagSexToy") Then
+			Dim tmpString5 As String = "toy"
+			If ssh.DommeImageSTR <> "" Then
+				Dim TagImageFolder5 As String = Directory.GetParent(ssh.DommeImageSTR).FullName
+				If File.Exists(TagImageFolder5 + "\\ImageTags.txt") Then
+
+					Dim TagCheckList5 As New List(Of String)()
+					TagCheckList5 = Common.Txt2List(TagImageFolder5 + "\\ImageTags.txt")
+					TagCheckList5 = StripBlankLines(TagCheckList5)
+
+					For i16 As Integer = 0 To TagCheckList5.Count - 1
+
+						If Not TagCheckList5(i16).Contains(Path.GetFileName(ssh.DommeImageSTR)) OrElse Not TagCheckList5(i16).Contains("TagSexToy") Then
+							Continue For
+						End If
+
+						Dim TagSplit5() As String = Strings.Split(TagCheckList5(i16))
+
+						For j6 As Integer = 0 To TagSplit5.Length - 1
+
+							If (TagSplit5(j6).Contains("TagSexToy")) Then
+
+								tmpString5 = TagSplit5(j6).Replace("TagSexToy", "")
+								Exit For
+							End If
+
+						Next
+					Next
+				End If
+			End If
+			StringClean = StringClean.Replace("#TagSexToy", tmpString5)
+		End If
+		If StringClean.Contains("#TagFurniture") Then
+			Dim tmpString5 As String = "furniture"
+			If ssh.DommeImageSTR <> "" Then
+				Dim TagImageFolder5 As String = Directory.GetParent(ssh.DommeImageSTR).FullName
+				If File.Exists(TagImageFolder5 + "\\ImageTags.txt") Then
+
+					Dim TagCheckList5 As New List(Of String)()
+					TagCheckList5 = Common.Txt2List(TagImageFolder5 + "\\ImageTags.txt")
+					TagCheckList5 = StripBlankLines(TagCheckList5)
+
+					For i16 As Integer = 0 To TagCheckList5.Count - 1
+
+						If Not TagCheckList5(i16).Contains(Path.GetFileName(ssh.DommeImageSTR)) OrElse Not TagCheckList5(i16).Contains("TagFurniture") Then
+							Continue For
+						End If
+
+						Dim TagSplit5() As String = Strings.Split(TagCheckList5(i16))
+
+						For j6 As Integer = 0 To TagSplit5.Length - 1
+
+							If (TagSplit5(j6).Contains("TagFurniture")) Then
+
+								tmpString5 = TagSplit5(j6).Replace("TagFurniture", "")
+								Exit For
+							End If
+
+						Next
+					Next
+				End If
+			End If
+			StringClean = StringClean.Replace("#TagFurniture", tmpString5)
+		End If
 		If StringClean.Contains("@ImageTag(") Then
 			Dim TagFlag As String = GetParentheses(StringClean, "@ImageTag(")
-			ShowImage(GetLocalImage(TagFlag), False)
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetLocalImage(TagFlag), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
 			StringClean = StringClean.Replace("@ImageTag(" & TagFlag & ")", "")
 		End If
 
 		If StringClean.Contains("@ImageTagOr(") Then
 			Dim TagFlag As String = GetParentheses(StringClean, "@ImageTagOr(")
-			ShowImage(GetLocalImage(TagFlag,, "Or"), False)
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetLocalImage(TagFlag,, "Or"), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
 			StringClean = StringClean.Replace("@ImageTagOr(" & TagFlag & ")", "")
 		End If
 
 		If StringClean.Contains("@ImageTagAny(") Then
 			Dim TagFlag As String = GetParentheses(StringClean, "@ImageTagAny(")
-			ShowImage(GetLocalImage(TagFlag,, "Any"), False)
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetLocalImage(TagFlag,, "Any"), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
+
 			StringClean = StringClean.Replace("@ImageTagAny(" & TagFlag & ")", "")
 		End If
+		If StringClean.Contains("@ImageTagFirst(") Then
+			Dim TagFlag As String = GetParentheses(StringClean, "@ImageTagFirst(")
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetLocalImage(TagFlag,, "First"), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
 
+			StringClean = StringClean.Replace("@ImageTagFirst(" & TagFlag & ")", "")
+		End If
 		If StringClean.Contains("@ShowButtImage") Or StringClean.Contains("@ShowButtsImage") Then
 			ShowImage(GetImageData(ImageGenre.Butt).Random(), False)
 
@@ -7242,17 +7495,36 @@ RinseLatherRepeat:
 		End If
 
 		If StringClean.Contains("@ShowLikedImage") Then
-			ShowImage(GetImageData(ImageGenre.Liked).Random(), False)
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetImageData(ImageGenre.Liked).Random(), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
+
 			StringClean = StringClean.Replace("@ShowLikedImage", "")
-		End If
+        End If
 
 		If StringClean.Contains("@ShowDislikedImage") Then
-			ShowImage(GetImageData(ImageGenre.Disliked).Random(), False)
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetImageData(ImageGenre.Disliked).Random(), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
 			StringClean = StringClean.Replace("@ShowDislikedImage", "")
 		End If
 
 		If StringClean.Contains("@ShowBlogImage") Then
-			ShowImage(GetImageData(ImageGenre.Blog).Random(), False)
+			Dim i As Integer = 0
+			While i < 10
+				If ShowImage(GetImageData(ImageGenre.Blog).Random(), False) Then
+					Exit While
+				End If
+				i += 1
+			End While
 			StringClean = StringClean.Replace("@ShowBlogImage", "")
 		End If
 
@@ -7340,12 +7612,18 @@ RinseLatherRepeat:
 			Dim tmpImgToShow As String = Application.StartupPath & "\Images\System\NoLocalImagesFound.jpg"
 			' If there are images, overwrite the error image.
 			If tmpImageLocationList.Count > 0 Then
-				tmpImgToShow = tmpImageLocationList(New Random().Next(0, tmpImageLocationList.Count))
+				tmpImgToShow = tmpImageLocationList(ssh.randomizer.Next(0, tmpImageLocationList.Count))
 			Else
 				Trace.WriteLine("failed to execute Command: @ShowLocalImage(" & LocalFlag & ") No images found.")
 			End If
 
-			ShowImage(tmpImgToShow, False)
+			Dim ix As Integer = 0
+			While ix < 10
+				If ShowImage(tmpImgToShow, False) Then
+					Exit While
+				End If
+				ix += 1
+			End While
 
 			StringClean = StringClean.Replace("@ShowLocalImage(" & GetParentheses(StringClean, "@ShowLocalImage(") & ")", "")
 		End If
@@ -7523,9 +7801,10 @@ RinseLatherRepeat:
 			End If
 
 
-			CustomSlideshowTimer.Interval = 1000
-			If LCase(SlideFlag).Contains("slow") Then CustomSlideshowTimer.Interval = 5000
-			If LCase(SlideFlag).Contains("fast") Then CustomSlideshowTimer.Interval = 500
+			CustomSlideshowTimer.Interval = 3000
+			If LCase(SlideFlag).Contains("slow") Then CustomSlideshowTimer.Interval = 6000
+			If LCase(SlideFlag).Contains("very slow") Then CustomSlideshowTimer.Interval = 9000
+			If LCase(SlideFlag).Contains("fast") Then CustomSlideshowTimer.Interval = 1200
 
 
 			StringClean = StringClean.Replace("@Slideshow(" & SlideFlag & ")", "")
@@ -10171,7 +10450,7 @@ OrgasmDecided:
 					Application.DoEvents()
 				End While
 			Else
-				MessageBox.Show(Me, "No videos were found !", "Error !", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+				MessageBox.Show(Me, "No videos were found !", "Error !", MessageBoxButtons.OK, MessageBoxIcon.Hand)
 			End If
 			ssh.RandomizerVideo = False
 		End If
@@ -12157,7 +12436,7 @@ VTSkip:
 		Try
 			If Linear = False Then
 				If FilterString.Includes("@DommeTag(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@DommeTag("), True) = String.Empty Then Return False
@@ -12165,7 +12444,7 @@ VTSkip:
 				End If
 
 				If FilterString.Includes("@DommeTagOr(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@DommeTagOr("), True, "Or") = String.Empty Then Return False
@@ -12173,7 +12452,7 @@ VTSkip:
 				End If
 
 				If FilterString.Includes("@DommeTagAny(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@DommeTagAny("), True, "Any") = String.Empty Then Return False
@@ -12181,7 +12460,7 @@ VTSkip:
 				End If
 
 				If FilterString.Includes("@DomTag(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@DomTag("), True) = String.Empty Then Return False
@@ -12189,7 +12468,7 @@ VTSkip:
 				End If
 
 				If FilterString.Includes("@DomTagOr(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@DomTagOr("), True, "Or") = String.Empty Then Return False
@@ -12197,15 +12476,21 @@ VTSkip:
 				End If
 
 				If FilterString.Includes("@DomTagAny(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@DomTagAny("), True, "Any") = String.Empty Then Return False
 					End If
 				End If
-
+				If FilterString.Includes("@DomTagFirst(") Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
+						Return False
+					Else
+						If GetLocalImage(GetParentheses(FilterString, "@DomTagFirst("), True, "First") = String.Empty Then Return False
+					End If
+				End If
 				If FilterString.Contains("@ImageTag(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@ImageTag(")) = String.Empty Then Return False
@@ -12213,7 +12498,7 @@ VTSkip:
 				End If
 
 				If FilterString.Contains("@ImageTagOr(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@ImageTagOr("),, "Or") = String.Empty Then Return False
@@ -12221,13 +12506,18 @@ VTSkip:
 				End If
 
 				If FilterString.Contains("@ImageTagAny(") Then
-					If ssh.LockImage = True Then
+					If ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled Then
 						Return False
 					Else
 						If GetLocalImage(GetParentheses(FilterString, "@ImageTagAny("),, "Any") = String.Empty Then Return False
 					End If
 				End If
-
+				If FilterString.Contains("@ShowDomRandomImage") AndAlso (ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled) Then
+					Return False
+				End If
+				If FilterString.Contains("@ShowImage") AndAlso (ssh.LockImage OrElse Not mainPictureBox.Visible OrElse ssh.CustomSlideEnabled) Then
+					Return False
+				End If
 				' ################## @Show-Category-Image #####################
 				If FilterString.Contains("@ShowBlogImage") Or FilterString.Contains("@NewBlogImage") Then
 					If Not GetImageData(ImageGenre.Blog).IsAvailable Or ssh.LockImage = True Or ssh.CustomSlideEnabled = True Or mainPictureBox.Visible = False Then Return False
@@ -12296,11 +12586,26 @@ VTSkip:
 				If FilterString.Contains("@ShowSoftcoreImage") Then
 					If Not GetImageData(ImageGenre.Softcore).IsAvailable Or ssh.LockImage = True Or ssh.CustomSlideEnabled = True Or mainPictureBox.Visible = False Then Return False
 				End If
+
 				'▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 				' Disqualifying @Commands - End
 				'▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 			End If
+			If FilterString.Contains("@Force") Then
+				If Not ssh.LockImage Then Return False
+			ElseIf ssh.LockImage OrElse ssh.CustomSlideEnabled Then
+				If Not FilterString.Contains("@PlayVideoNoWait") AndAlso FilterString.Contains("@PlayVideo") Then
+					Return False
+				End If
+				If FilterString.Contains("@PlayRedLightGreenLight") OrElse FilterString.Contains("@PlayAvoidTheEdge") Then
+					Return False
+				End If
 
+			End If
+			If Not FilterString.Contains("@PlayVideoNoWait") AndAlso (FilterString.Contains("@PlayVideo") OrElse FilterString.Contains("@PlayRedLightGreenLight") OrElse
+				FilterString.Contains("@PlayAvoidTheEdge")) AndAlso Not FilterString.Contains("@StopVideo") AndAlso ((DomWMP.playState = WMPPlayState.wmppsPlaying) OrElse (DomWMP.playState = WMPPlayState.wmppsPaused)) Then
+				Return False
+			End If
 			'▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 			'							Commands to sort out
 			' This Section contains @Commands, which are able to disqualify vocabulary lines.
@@ -14382,6 +14687,19 @@ RestartFunction:
 
 
 #Region "---------------------------------------------------- Domme-WMP -------------------------------------------------------"
+	Private Sub contextWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles contextWMP.PlayStateChange
+		If contextWMP.playState = WMPPlayState.wmppsStopped Then
+
+			contextWMP.currentPlaylist.clear()
+		End If
+	End Sub
+
+	Private Sub voiceDomWMP_PlayStateChange(sender As Object, e As _WMPOCXEvents_PlayStateChangeEvent) Handles voiceDomWMP.PlayStateChange
+		If voiceDomWMP.playState = WMPPlayState.wmppsStopped Then
+
+			voiceDomWMP.currentPlaylist.clear()
+		End If
+	End Sub
 
 	Private Sub DomWMP_PlayStateChange(ByVal sender As Object, ByVal e As AxWMPLib._WMPOCXEvents_PlayStateChangeEvent) Handles DomWMP.PlayStateChange
 
@@ -15232,6 +15550,193 @@ saveImage:
 #End Region  ' DommeSlideshow
 
 #End Region  ' PictureStrip
+
+	Public Sub InitDommeImageFolder()
+		If My.Settings.CBAutoDomPP OrElse FrmSettings.CBRandomDomme.Checked Then
+			Dim avatarImage As String = checkForImage("/avatar*.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact))
+			If String.IsNullOrEmpty(avatarImage) Then
+				avatarImage = ssh.SlideshowMain.ImageList(ssh.randomizer.Next(0, ssh.SlideshowMain.ImageList.Count - 1))
+			End If
+			domAvatar.Image = Image.FromFile(avatarImage)
+			ssh.domAvatarImage = domAvatar.Image
+			Dim glitterImage2 As String = checkForImage("/glitter*.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact))
+			If String.IsNullOrEmpty(glitterImage2) Then
+				glitterImage2 = avatarImage
+			End If
+			If Not String.IsNullOrEmpty(glitterImage2) Then
+				FrmSettings.GlitterAV.Image = Image.FromFile(glitterImage2)
+				If Not FrmSettings.CBRandomDomme.Checked Then
+					My.Settings.GlitterAV = glitterImage2
+				End If
+			End If
+		End If
+		CheckRandomOpportunities()
+		If FrmSettings.CBRandomGlitter.Checked AndAlso FrmSettings.CBRandomGlitter.Enabled Then
+			Dim Contact1dirspecial As String = My.Settings.RandomImageDir + "\\#Contact1"
+			Dim Contact2dirspecial As String = My.Settings.RandomImageDir + "\\#Contact2"
+			Dim Contact3dirspecial As String = My.Settings.RandomImageDir + "\\#Contact3"
+			Dim Contact1path As String = ""
+			Dim Contact2path As String = ""
+			Dim Contact3path As String = ""
+			If Directory.Exists(Contact1dirspecial) Then
+				Contact1path = LoadRandomFolder(Contact1dirspecial)
+			Else
+				Contact1path = LoadRandomFolder(My.Settings.RandomImageDir)
+			End If
+
+			If Directory.Exists(Contact2dirspecial) Then
+				Contact2path = LoadRandomFolder(Contact2dirspecial)
+			Else
+				Contact2path = LoadRandomFolder(My.Settings.RandomImageDir)
+			End If
+
+			If Directory.Exists(Contact3dirspecial) Then
+				Contact3path = LoadRandomFolder(Contact3dirspecial)
+			Else
+				Contact3path = LoadRandomFolder(My.Settings.RandomImageDir)
+			End If
+
+
+			Dim Contact1dir As DirectoryInfo = Directory.GetParent(Contact1path)
+			While Contact1dir.Name = ssh.tempDomName
+				Contact1path = LoadRandomFolder(My.Settings.RandomImageDir)
+				Contact1dir = Directory.GetParent(Contact1path)
+			End While
+			Dim Contact2dir As DirectoryInfo = Directory.GetParent(Contact2path)
+			While Contact2dir.Name = ssh.tempDomName
+				Contact2path = LoadRandomFolder(My.Settings.RandomImageDir)
+				Contact2dir = Directory.GetParent(Contact2path)
+			End While
+
+			Dim Contact3dir As DirectoryInfo = Directory.GetParent(Contact3path)
+			While Contact3dir.Name = ssh.tempDomName
+				Contact3path = LoadRandomFolder(My.Settings.RandomImageDir)
+				Contact3dir = Directory.GetParent(Contact3path)
+			End While
+
+
+			My.Settings.Contact1ImageDir = Contact1dir.FullName
+			My.Settings.Contact2ImageDir = Contact2dir.FullName
+			My.Settings.Contact3ImageDir = Contact3dir.FullName
+			My.Settings.Glitter1 = Contact1dir.Name
+			My.Settings.Glitter2 = Contact2dir.Name
+			My.Settings.Glitter3 = Contact3dir.Name
+			ssh.SlideshowContact1 = New ContactData(ContactType.Contact1)
+			ssh.SlideshowContact1.LoadNew(ssh.newSlideshow)
+			Dim glitterImage As String = checkForImage("/glitter*.*", Contact1path)
+			If glitterImage = "" Then
+				glitterImage = checkForImage("/*", Contact1path)
+			End If
+			If glitterImage <> "" Then
+				My.Settings.GlitterAV1 = glitterImage
+				FrmSettings.GlitterAV1.Image = Image.FromFile(glitterImage)
+			End If
+			ssh.SlideshowContact2 = New ContactData(ContactType.Contact2)
+			ssh.SlideshowContact2.LoadNew(ssh.newSlideshow)
+			glitterImage = checkForImage("/glitter*.*", Contact2path)
+			If glitterImage = "" Then
+				glitterImage = checkForImage("/*", Contact2path)
+			End If
+			If glitterImage <> "" Then
+				My.Settings.GlitterAV2 = glitterImage
+				FrmSettings.GlitterAV2.Image = Image.FromFile(glitterImage)
+			End If
+
+			ssh.SlideshowContact3 = New ContactData(ContactType.Contact3)
+			ssh.SlideshowContact3.LoadNew(ssh.newSlideshow)
+			glitterImage = checkForImage("/glitter*.*", Contact3path)
+			If glitterImage = "" Then
+				glitterImage = checkForImage("/*", Contact3path)
+			End If
+			If glitterImage <> "" Then
+				My.Settings.GlitterAV3 = glitterImage
+				FrmSettings.GlitterAV3.Image = Image.FromFile(glitterImage)
+			End If
+
+		End If
+		Dim RandImgDirectoryD As String = "\\#RandomPics"
+		Dim RandImgPathDirectoryD As String = ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact) + RandImgDirectoryD
+		Dim ClipDirectoryD As String = "\\#Clips"
+		Dim ClipPathDirectoryD As String = ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact) + ClipDirectoryD
+		If (Directory.Exists(RandImgDirectoryD)) Then
+
+			' Conversions.ToString(My.Settings.PropertyValues["DomImageDirRand"].Property.DefaultValue)
+			My.Settings.DomImageDirRand = RandImgPathDirectoryD
+
+		End If
+		If (Directory.Exists(ClipPathDirectoryD)) Then
+
+			Dim def As String = My.Settings("VideoSoftcoreD").Property.DefaultValue
+			My.Settings.VideoSoftcoreD = ClipPathDirectoryD + "\\Softcore"
+			If FrmSettings.VideoSoftcoreD_Count(False) <> 0 Then
+
+				My.Settings.CBSoftcoreD = True
+			Else
+
+				My.Settings.CBSoftcoreD = False
+				My.Settings.VideoSoftcoreD = def
+			End If
+			def = My.Settings("VideoHardcoreD").Property.DefaultValue
+			My.Settings.VideoHardcoreD = ClipPathDirectoryD + "\\Hardcore"
+			If FrmSettings.VideoHardcoreD_Count(False) <> 0 Then
+				My.Settings.CBHardcoreD = True
+			Else
+				My.Settings.CBHardcoreD = False
+				My.Settings.VideoHardcoreD = def
+			End If
+			def = My.Settings("VideoLesbianD").Property.DefaultValue
+			My.Settings.VideoLesbianD = ClipPathDirectoryD + "\\Lesbian"
+			If FrmSettings.VideoLesbianD_Count(False) <> 0 Then
+				My.Settings.CBLesbianD = True
+			Else
+				My.Settings.CBLesbianD = False
+				My.Settings.VideoLesbianD = def
+			End If
+			def = My.Settings("VideoBlowjobD").Property.DefaultValue
+			My.Settings.VideoBlowjobD = ClipPathDirectoryD + "\\Blowjob"
+			If FrmSettings.VideoBlowjobD_Count(False) <> 0 Then
+				My.Settings.CBBlowjobD = True
+			Else
+				My.Settings.CBBlowjobD = False
+				My.Settings.VideoBlowjobD = def
+			End If
+			def = My.Settings("VideoFemsubD").Property.DefaultValue
+			My.Settings.VideoFemsubD = ClipPathDirectoryD + "\\Femsub"
+			If FrmSettings.VideoFemsubD_Count(False) <> 0 Then
+				My.Settings.CBFemsubD = True
+			Else
+				My.Settings.CBFemsubD = False
+				My.Settings.VideoFemsubD = def
+			End If
+			def = My.Settings("VideoJOID").Property.DefaultValue
+			My.Settings.VideoJOID = ClipPathDirectoryD + "\\JOI"
+			If FrmSettings.VideoJOID_Count(False) <> 0 Then
+				My.Settings.CBJOID = True
+			Else
+				My.Settings.CBJOID = False
+				My.Settings.VideoJOID = def
+			End If
+			def = My.Settings("VideoCHD").Property.DefaultValue
+			My.Settings.VideoCHD = ClipPathDirectoryD + "\\CH"
+			If FrmSettings.VideoCHD_Count(False) <> 0 Then
+				My.Settings.CBCHD = True
+			Else
+				My.Settings.CBCHD = False
+				My.Settings.VideoCHD = def
+			End If
+			def = My.Settings("VideoGeneralD").Property.DefaultValue
+			My.Settings.VideoGeneralD = ClipPathDirectoryD + "\\General"
+			If FrmSettings.VideoGeneralD_Count(False) <> 0 Then
+				My.Settings.CBGeneralD = True
+			Else
+				My.Settings.CBGeneralD = False
+				My.Settings.VideoGeneralD = def
+			End If
+		End If
+		If ssh.currentlyPresentContacts.Count = 0 Then
+			ssh.currentlyPresentContacts.Add(ssh.SlideshowMain.TypeName)
+		End If
+	End Sub
 
 	Public Sub LoadDommeImageFolder()
 		'check which domme should be loaded
@@ -16360,6 +16865,10 @@ restartInstantly:
 	End Sub
 
 	Private Sub RefreshRandomizerToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RefreshRandomizerToolStripMenuItem.Click
+		RefreshRandomize()
+	End Sub
+
+	Private Sub RefreshRandomize()
 		ssh.randomizer = New Random(System.DateTime.Now.Ticks Mod System.Int32.MaxValue)
 	End Sub
 
@@ -16379,8 +16888,7 @@ restartInstantly:
 
 	Private Sub TeaseAIClock_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TeaseAIClock.Tick
 		' Reset the WatchdogTimer Clock. 
-		WatchDogImageAnimator.Reset(TeaseAIClock.Interval * 3)
-
+		'WatchDogImageAnimator.Reset(TeaseAIClock.Interval * 3)
 
 		If FrmSettings.CBSettingsPause.Checked = True And FrmSettings.SettingsPanel.Visible = True Then
 			LBLTime.Text = Format(Now, "h:mm")
@@ -16470,7 +16978,7 @@ restartInstantly:
 		If ssh.StrokeFaster = True Then
 			If ssh.SubStroking = True And ssh.SubEdging = False And ssh.SubHoldingEdge = False Then
 				Debug.Print("Stroke Faster")
-				Dim Stroke123 As Integer = ssh.randomizer.Next(5, 12)
+				Dim Stroke123 As Integer = ssh.randomizer.Next(3, 7)
 				Stroke123 = Stroke123 * 50
 				StrokePace = StrokePace - Stroke123
 				If StrokePace < NBMaxPace.Value Then StrokePace = NBMaxPace.Value
@@ -16482,7 +16990,7 @@ restartInstantly:
 		If ssh.StrokeSlower = True Then
 			If ssh.SubStroking = True And ssh.SubEdging = False And ssh.SubHoldingEdge = False Then
 				Debug.Print("Stroke Slower")
-				Dim Stroke123 As Integer = ssh.randomizer.Next(3, 8)
+				Dim Stroke123 As Integer = ssh.randomizer.Next(3, 7)
 				Stroke123 = Stroke123 * 50
 				StrokePace = StrokePace + Stroke123
 				If StrokePace > NBMinPace.Value Then StrokePace = NBMinPace.Value
@@ -19434,5 +19942,7 @@ ShowedBlogImage:
 	Private Sub LoadCustomizedSlideshow(sender As Object, e As KeyEventArgs)
 
 	End Sub
+
+
 End Class
 

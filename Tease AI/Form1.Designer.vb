@@ -29,6 +29,8 @@ Partial Class Form1
         Me.mainPictureBox = New System.Windows.Forms.PictureBox()
         Me.domAvatar = New System.Windows.Forms.PictureBox()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.voiceDomWMP = New AxWMPLib.AxWindowsMediaPlayer()
+        Me.contextWMP = New AxWMPLib.AxWindowsMediaPlayer()
         Me.DomWMP = New AxWMPLib.AxWindowsMediaPlayer()
         Me.ProgressBar_BGW_Images = New System.Windows.Forms.ProgressBar()
         Me.CensorshipBar = New System.Windows.Forms.Panel()
@@ -405,14 +407,14 @@ Partial Class Form1
         Me.TimeoutTimer = New Tease_AI.teaseAI_Timer()
         Me.VideoTimer = New Tease_AI.teaseAI_Timer()
         Me.MultipleEdgesTimer = New Tease_AI.teaseAI_Timer()
-        Me.contextWMP = New AxWMPLib.AxWindowsMediaPlayer()
-        Me.voiceDomWMP = New AxWMPLib.AxWindowsMediaPlayer()
         CType(Me.mainPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.domAvatar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        CType(Me.voiceDomWMP, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.contextWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DomWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PnlChatTextLayout.SuspendLayout()
         Me.PNLMediaBar.SuspendLayout()
@@ -458,8 +460,6 @@ Partial Class Form1
         Me.PnlSidepanelLayout.SuspendLayout()
         Me.PnlTabsLayout.SuspendLayout()
         Me.PnlLayoutForm.SuspendLayout()
-        CType(Me.contextWMP, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.voiceDomWMP, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'domName
@@ -496,7 +496,7 @@ Partial Class Form1
         Me.mainPictureBox.Image = CType(resources.GetObject("mainPictureBox.Image"), System.Drawing.Image)
         Me.mainPictureBox.Location = New System.Drawing.Point(0, 0)
         Me.mainPictureBox.Name = "mainPictureBox"
-        Me.mainPictureBox.Size = New System.Drawing.Size(1398, 384)
+        Me.mainPictureBox.Size = New System.Drawing.Size(1398, 791)
         Me.mainPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.mainPictureBox.TabIndex = 3
         Me.mainPictureBox.TabStop = False
@@ -548,6 +548,30 @@ Partial Class Form1
         Me.SplitContainer1.SplitterWidth = 10
         Me.SplitContainer1.TabIndex = 136
         '
+        'voiceDomWMP
+        '
+        Me.voiceDomWMP.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.voiceDomWMP.Enabled = True
+        Me.voiceDomWMP.Location = New System.Drawing.Point(0, -78)
+        Me.voiceDomWMP.Name = "voiceDomWMP"
+        Me.voiceDomWMP.OcxState = CType(resources.GetObject("voiceDomWMP.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.voiceDomWMP.Size = New System.Drawing.Size(1398, 15)
+        Me.voiceDomWMP.TabIndex = 775
+        Me.voiceDomWMP.TabStop = False
+        Me.voiceDomWMP.Visible = False
+        '
+        'contextWMP
+        '
+        Me.contextWMP.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.contextWMP.Enabled = True
+        Me.contextWMP.Location = New System.Drawing.Point(0, -78)
+        Me.contextWMP.Name = "contextWMP"
+        Me.contextWMP.OcxState = CType(resources.GetObject("contextWMP.OcxState"), System.Windows.Forms.AxHost.State)
+        Me.contextWMP.Size = New System.Drawing.Size(1398, 15)
+        Me.contextWMP.TabIndex = 774
+        Me.contextWMP.TabStop = False
+        Me.contextWMP.Visible = False
+        '
         'DomWMP
         '
         Me.DomWMP.Dock = System.Windows.Forms.DockStyle.Fill
@@ -555,14 +579,14 @@ Partial Class Form1
         Me.DomWMP.Location = New System.Drawing.Point(0, 0)
         Me.DomWMP.Name = "DomWMP"
         Me.DomWMP.OcxState = CType(resources.GetObject("DomWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.DomWMP.Size = New System.Drawing.Size(1398, 378)
+        Me.DomWMP.Size = New System.Drawing.Size(1398, 785)
         Me.DomWMP.TabIndex = 96
         Me.DomWMP.Visible = False
         '
         'ProgressBar_BGW_Images
         '
         Me.ProgressBar_BGW_Images.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.ProgressBar_BGW_Images.Location = New System.Drawing.Point(0, 378)
+        Me.ProgressBar_BGW_Images.Location = New System.Drawing.Point(0, 785)
         Me.ProgressBar_BGW_Images.MarqueeAnimationSpeed = 10000
         Me.ProgressBar_BGW_Images.Name = "ProgressBar_BGW_Images"
         Me.ProgressBar_BGW_Images.Size = New System.Drawing.Size(1398, 6)
@@ -601,7 +625,7 @@ Partial Class Form1
         Me.PnlChatTextLayout.Location = New System.Drawing.Point(0, 32)
         Me.PnlChatTextLayout.Name = "PnlChatTextLayout"
         Me.PnlChatTextLayout.Padding = New System.Windows.Forms.Padding(1)
-        Me.PnlChatTextLayout.Size = New System.Drawing.Size(1398, 504)
+        Me.PnlChatTextLayout.Size = New System.Drawing.Size(1398, 97)
         Me.PnlChatTextLayout.TabIndex = 783
         '
         'ChatText
@@ -610,7 +634,7 @@ Partial Class Form1
         Me.ChatText.Location = New System.Drawing.Point(1, 1)
         Me.ChatText.MinimumSize = New System.Drawing.Size(2, 20)
         Me.ChatText.Name = "ChatText"
-        Me.ChatText.Size = New System.Drawing.Size(1396, 502)
+        Me.ChatText.Size = New System.Drawing.Size(1396, 95)
         Me.ChatText.TabIndex = 1
         '
         'PNLMediaBar
@@ -4367,30 +4391,6 @@ Partial Class Form1
         '
         Me.MultipleEdgesTimer.Interval = 1000
         '
-        'contextWMP
-        '
-        Me.contextWMP.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.contextWMP.Enabled = True
-        Me.contextWMP.Location = New System.Drawing.Point(0, -75)
-        Me.contextWMP.Name = "contextWMP"
-        Me.contextWMP.OcxState = CType(resources.GetObject("contextWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.contextWMP.Size = New System.Drawing.Size(1398, 15)
-        Me.contextWMP.TabIndex = 774
-        Me.contextWMP.TabStop = False
-        Me.contextWMP.Visible = False
-        '
-        'voiceDomWMP
-        '
-        Me.voiceDomWMP.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.voiceDomWMP.Enabled = True
-        Me.voiceDomWMP.Location = New System.Drawing.Point(0, -75)
-        Me.voiceDomWMP.Name = "voiceDomWMP"
-        Me.voiceDomWMP.OcxState = CType(resources.GetObject("voiceDomWMP.OcxState"), System.Windows.Forms.AxHost.State)
-        Me.voiceDomWMP.Size = New System.Drawing.Size(1398, 15)
-        Me.voiceDomWMP.TabIndex = 775
-        Me.voiceDomWMP.TabStop = False
-        Me.voiceDomWMP.Visible = False
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -4416,6 +4416,8 @@ Partial Class Form1
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        CType(Me.voiceDomWMP, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.contextWMP, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DomWMP, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PnlChatTextLayout.ResumeLayout(False)
         Me.PNLMediaBar.ResumeLayout(False)
@@ -4473,8 +4475,6 @@ Partial Class Form1
         Me.PnlSidepanelLayout.ResumeLayout(False)
         Me.PnlTabsLayout.ResumeLayout(False)
         Me.PnlLayoutForm.ResumeLayout(False)
-        CType(Me.contextWMP, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.voiceDomWMP, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
