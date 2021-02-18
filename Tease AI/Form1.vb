@@ -220,9 +220,6 @@ Public Class Form1
 	End Sub
 
 
-	Init
-
-
 	Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 		Dim enumerator As IEnumerator = Nothing
 		Dim GlitterScriptCount As Integer = 0
@@ -15637,7 +15634,7 @@ saveImage:
 				Contact1dir = Directory.GetParent(Contact1path)
 			End While
 			Dim Contact2dir As DirectoryInfo = Directory.GetParent(Contact2path)
-			While Contact2dir.Name = ssh.tempDomName OrElse OrElse Contact2dir.Name = Contact1dir.Name
+			While Contact2dir.Name = ssh.tempDomName OrElse Contact2dir.Name = Contact1dir.Name
 				Contact2path = LoadRandomFolder(My.Settings.RandomImageDir)
 				Contact2dir = Directory.GetParent(Contact2path)
 			End While
