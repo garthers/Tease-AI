@@ -185,7 +185,6 @@ Partial Public Class Form1
 
 			Dim DateArray() As String = DateFlag.Split(",")
 			Dim DDiff As Long = 18855881
-			Dim DDiff2 As Long = 18855881
 
 			Dim DCompare As Long
 			Dim DCompare2 As Long
@@ -202,7 +201,7 @@ Partial Public Class Form1
 				If DateArray.Count = 3 Then
 					DDiff = GetDateDifference(DateArray(0), DateArray(1))
 					DCompare = GetDateCompare(DateArray(0), DateArray(1))
-					DDiff2 = GetDateDifference(DateArray(0), DateArray(2))
+					Dim DDiff2 As Long = GetDateDifference(DateArray(0), DateArray(2))
 					DCompare2 = GetDateCompare(DateArray(0), DateArray(2))
 					If DDiff >= DCompare And DDiff2 <= DCompare2 Then Return True
 					Return False
@@ -225,7 +224,7 @@ Partial Public Class Form1
 				If DateArray.Count = 4 Then
 					DDiff = GetDateDifference(DateArray(0), DateArray(1))
 					DCompare = GetDateCompare(DateArray(0), DateArray(1))
-					DDiff2 = GetDateDifference(DateArray(0), DateArray(2))
+					Dim DDiff2 As Long = GetDateDifference(DateArray(0), DateArray(2))
 					DCompare2 = GetDateCompare(DateArray(0), DateArray(2))
 					If DDiff >= DCompare And DDiff2 <= DCompare2 Then Return True
 					Return False

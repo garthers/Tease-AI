@@ -529,8 +529,8 @@ NoneFound:
         ' Check if there are images
         If AllImages.Count = 0 Then Return Application.StartupPath & "\Images\System\NoLocalImagesFound.jpg"
 
-        ' get an Random Image from the all available Locations
-        Return AllImages(New Random().Next(0, AllImages.Count)).ToString
+		' get an Random Image from the all available Locations
+		Return AllImages(ssh.randomizer.Next(0, AllImages.Count)).ToString
 	End Function
 
     ''' <summary>
@@ -565,8 +565,8 @@ NoneFound:
         ' Check if Genres are present.
         If allImages.Count = 0 Then GoTo NoNeFound
 
-        ' get an Random Image for the given SourceType
-        Return allImages(New Random().Next(0, allImages.Count)).ToString
+		' get an Random Image for the given SourceType
+		Return allImages(ssh.randomizer.Next(0, allImages.Count)).ToString
 NoNeFound:
 		' Return an Error-Image FilePath
 		If source = ImageSourceType.Local _
@@ -881,42 +881,61 @@ retryLocal: ' If an exception occures the function is restarted and the Errorima
 	''' <param name="newImage">The Image to set. It is safe to dispose the given image afterwards.
 	''' <para>If the given images is Nothing/NULL the Mainbicturebox will be cleared.</para></param>
 	''' <param name="ImagePath"></param>
-	Sub MainPictureboxSetImage(ByVal newImage As Image, ByVal ImagePath As String)
-		Try
-			' This starts the ImageAnimator-Thread again. 
-			' Assigning a new image to the Picturebox, while the ImageAnimator is 
-			' currently stopped, will result in a deadlock!
-			mreImageanimator.Set()
+	Public Sub MainPictureboxSetImage(ByVal newImage As Image, ByVal ImagePath As String)
 
-			' Release all ressources 
+		Try
+			mreImageanimator.[Set]()
+
 			If mainPictureBox.Image IsNot Nothing Then
-				Dim OldImage As Image = mainPictureBox.Image
-				OldImage.Dispose()
-				GC.Collect()
+				mainPictureBox.Image.Dispose()
+				' GC.Collect()
 			End If
 
-			'Set the new image and redraw the control
 			If newImage IsNot Nothing Then
-				mainPictureBox.Image = newImage.Clone
 
-				If My.Settings.CBStretchLandscape Then
+				If ImagePath.ToLower().Trim(" "c).EndsWith(".gif") Then
+					Dim newsize As Size = New Size(newImage.Width, newImage.Height)
 
-					If mainPictureBox.Image.Width > mainPictureBox.Image.Height Then
-						mainPictureBox.SizeMode = PictureBoxSizeMode.StretchImage
+					If (newImage.Height <= 700) And (newImage.Width <= 1000) Then
+						mainPictureBox.Dock = DockStyle.None
+						mainPictureBox.SizeMode = PictureBoxSizeMode.Zoom
+						' special gif handling
+						newsize = (If((newImage.Height <= 600) And (newImage.Width <= 1000), (If((newImage.Height <= 150) And (newImage.Width <= 250), New Size(newImage.Width * 4, newImage.Height * 4), (If((newImage.Height <= 300) And (newImage.Width <= 450), New Size((newImage.Width * 2.8), ((newImage.Height * 2.8))), (If(((newImage.Height <= 400) And (newImage.Width <= 600)), New Size(newImage.Width * 2, newImage.Height * 2), (If((Not ((newImage.Height <= 500) And (newImage.Width <= 800))), New Size(newImage.Width * 1.2, newImage.Height * 1.2), New Size(newImage.Width * 1.5, newImage.Height * 1.5))))))))), (If((newImage.Height <= 300) Or (newImage.Width <= 450), (If(newImage.Height > 500, New Size(newImage.Width * 1.6, newImage.Height * 1.6), New Size(newImage.Width * 2, newImage.Height * 2))), (If((newImage.Height <= 400) Or (newImage.Width <= 600), (If(newImage.Height > 500, New Size(newImage.Width * 1.4, newImage.Height * 1.4), New Size(newImage.Width * 1.8, newImage.Height * 1.8))), (If((newImage.Height > 500), New Size(newImage.Width * 1.2, newImage.Height * 1.2), New Size(newImage.Width * 1.4, newImage.Height * 1.4)))))))))
+						mainPictureBox.Size = newsize
+						mainPictureBox.Top = 0
+						mainPictureBox.Left = 0
+
+						If SplitContainer1.Panel1.Height >= newsize.Height Then
+							mainPictureBox.Top = SplitContainer1.Panel1.Height / 2.0 - newsize.Height / 2.0
+						End If
+
+						If SplitContainer1.Panel1.Width >= newsize.Width Then
+							mainPictureBox.Left = SplitContainer1.Panel1.Width / 2.0 - newsize.Width / 2.0
+						End If
+					Else
+						mainPictureBox.Dock = DockStyle.Fill
+						mainPictureBox.SizeMode = PictureBoxSizeMode.CenterImage
+					End If
+				Else
+					mainPictureBox.Dock = DockStyle.Fill
+
+					If My.Settings.CBStretchLandscape Then
+
+						If mainPictureBox.Image.Width > mainPictureBox.Image.Height Then
+							mainPictureBox.SizeMode = PictureBoxSizeMode.StretchImage
+						Else
+							mainPictureBox.SizeMode = PictureBoxSizeMode.Zoom
+						End If
 					Else
 						mainPictureBox.SizeMode = PictureBoxSizeMode.Zoom
 					End If
-				Else
-					mainPictureBox.SizeMode = PictureBoxSizeMode.Zoom
 				End If
 
-				mainPictureBox.Invalidate()
-				mainPictureBox.Refresh()
+				mainPictureBox.Image = CType(newImage.Clone(), Image)
 			Else
 				ImagePath = ""
 			End If
 
-			' Updeate the pathimformations.
 			If ImagePath <> pathImageErrorOnLoading Then
 				ssh.ImageLocation = ImagePath
 				LBLImageInfo.Text = ImagePath
@@ -927,20 +946,14 @@ retryLocal: ' If an exception occures the function is restarted and the Errorima
 				mainPictureBox.ImageLocation = ""
 			End If
 
-			' Update the DommeTag-App.
 			CheckDommeTags()
 
-			' Update the the picturestrip, when it's opened.
 			If PictureStrip.Visible Then
 				PictureStrip_Opening(Nothing, Nothing)
 			End If
 
 		Catch ex As Exception
-			'▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
-			'                                            All Errors
-			'▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
-			Log.WriteError("Unable to set image in MainPictureBox: " & ex.Message,
-				 ex, "MainPictureboxSetImage")
+			Log.WriteError("Unable to set image in MainPictureBox: " & ex.Message, ex, "MainPictureboxSetImage")
 		End Try
 	End Sub
 
