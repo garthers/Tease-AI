@@ -1524,7 +1524,7 @@ WritingTaskLine:
 				ssh.StrokeTauntVal = -1
 				ssh.FileText = ATEList(ssh.randomizer.Next(0, ATEList.Count))
 
-				ssh.ScriptTick = 2
+				ssh.ScriptTick = 1
 				ScriptTimer.Start()
 				Return
 			End If
@@ -4326,14 +4326,21 @@ DommeSlideshowFallback:
 						ssh.SubStroking = True
 						ssh.SubEdging = False
 						ssh.SubHoldingEdge = False
-						StrokePace = ssh.randomizer.Next(NBMaxPace.Value, NBMinPace.Value + 1)
-						StrokePace = 50 * Math.Round(StrokePace / 50)
-						ssh.RLGLTauntTick = ssh.randomizer.Next(20, 31)
-						' VideoTauntTick = randomizer.Next(20, 31)
-						RLGLTauntTimer.Start()
+						Dim tempMinPaceValue2 As Decimal = NBMinPace.Value - 621
+						Dim tempMaxPaceValue4 As Decimal = NBMaxPace.Value + 221
+						If tempMinPaceValue2 <= tempMaxPaceValue4 Then
+							tempMinPaceValue2 = tempMaxPaceValue4 + 10
+						End If
+						StrokePace = ssh.randomizer.Next(tempMaxPaceValue4, tempMinPaceValue2)
 
+						'StrokePace = ssh.randomizer.Next(NBMaxPace.Value, NBMinPace.Value + 1)
+						StrokePace = 50 * Math.Round(StrokePace / 50)
+							ssh.RLGLTauntTick = ssh.randomizer.Next(20, 31)
+							' VideoTauntTick = randomizer.Next(20, 31)
+							RLGLTauntTimer.Start()
+
+						End If
 					End If
-				End If
 
 				If ssh.RLGLGame = True And ssh.RedLight = True Then
 					If (DomWMP.playState = WMPLib.WMPPlayState.wmppsPlaying) Then
@@ -10325,27 +10332,25 @@ OrgasmDecided:
 						If UCase(VideoFlagArray(i)).Contains("M") Then VidInt *= 60
 					End If
 					Dim temp As String = ""
-					If Not VideoCheckInput Then
-						If String.Compare(VideoFlagArray(i), "HARDCORE") = 0 Then temp = "HARDCORE"
-						If String.Compare(VideoFlagArray(i), "SOFTCORE") = 0 Then temp = "SOFTCORE"
-						If String.Compare(VideoFlagArray(i), "LESBIAN") = 0 Then temp = "LESBIAN"
-						If String.Compare(VideoFlagArray(i), "BLOWJOB") = 0 Then temp = "BLOWJOB"
-						If String.Compare(VideoFlagArray(i), "FEMDOM") = 0 Then temp = "FEMDOM"
-						If String.Compare(VideoFlagArray(i), "FEMSUB") = 0 Then temp = "FEMSUB"
-						If String.Compare(VideoFlagArray(i), "JOI") = 0 Then temp = "JOI"
-						If String.Compare(VideoFlagArray(i), "CH") = 0 Then temp = "CH"
-						If String.Compare(VideoFlagArray(i), "GENERAL") = 0 Then temp = "GENERAL"
+					If String.Compare(VideoFlagArray(i), "HARDCORE") = 0 Then temp = "HARDCORE"
+					If String.Compare(VideoFlagArray(i), "SOFTCORE") = 0 Then temp = "SOFTCORE"
+					If String.Compare(VideoFlagArray(i), "LESBIAN") = 0 Then temp = "LESBIAN"
+					If String.Compare(VideoFlagArray(i), "BLOWJOB") = 0 Then temp = "BLOWJOB"
+					If String.Compare(VideoFlagArray(i), "FEMDOM") = 0 Then temp = "FEMDOM"
+					If String.Compare(VideoFlagArray(i), "FEMSUB") = 0 Then temp = "FEMSUB"
+					If String.Compare(VideoFlagArray(i), "JOI") = 0 Then temp = "JOI"
+					If String.Compare(VideoFlagArray(i), "CH") = 0 Then temp = "CH"
+					If String.Compare(VideoFlagArray(i), "GENERAL") = 0 Then temp = "GENERAL"
 
-						If String.Compare(VideoFlagArray(i), "HARDCORE DOMME") = 0 Then temp = "HARDCORD"
-						If String.Compare(VideoFlagArray(i), "SOFTCORE DOMME") = 0 Then temp = "SOFTCORD"
-						If String.Compare(VideoFlagArray(i), "LESBIAN DOMME") = 0 Then temp = "LESBIAD"
-						If String.Compare(VideoFlagArray(i), "BLOWJOB DOMME") = 0 Then temp = "BLOWJOD"
-						If String.Compare(VideoFlagArray(i), "FEMDOM DOMME") = 0 Then temp = "FEMDOD"
-						If String.Compare(VideoFlagArray(i), "FEMSUB DOMME") = 0 Then temp = "FEMSUD"
-						If String.Compare(VideoFlagArray(i), "JOI DOMME") = 0 Then temp = "JOD"
-						If String.Compare(VideoFlagArray(i), "CH DOMME") = 0 Then temp = "CD"
-						If String.Compare(VideoFlagArray(i), "GENERAL DOMME") = 0 Then temp = "GENERAD"
-					End If
+					If String.Compare(VideoFlagArray(i), "HARDCORE DOMME") = 0 Then temp = "HARDCORD"
+					If String.Compare(VideoFlagArray(i), "SOFTCORE DOMME") = 0 Then temp = "SOFTCORD"
+					If String.Compare(VideoFlagArray(i), "LESBIAN DOMME") = 0 Then temp = "LESBIAD"
+					If String.Compare(VideoFlagArray(i), "BLOWJOB DOMME") = 0 Then temp = "BLOWJOD"
+					If String.Compare(VideoFlagArray(i), "FEMDOM DOMME") = 0 Then temp = "FEMDOD"
+					If String.Compare(VideoFlagArray(i), "FEMSUB DOMME") = 0 Then temp = "FEMSUD"
+					If String.Compare(VideoFlagArray(i), "JOI DOMME") = 0 Then temp = "JOD"
+					If String.Compare(VideoFlagArray(i), "CH DOMME") = 0 Then temp = "CD"
+					If String.Compare(VideoFlagArray(i), "GENERAL DOMME") = 0 Then temp = "GENERAD"
 					If VideoCheckInput Then
 						ssh.VideoGenre = temp
 					Else
@@ -10353,44 +10358,44 @@ OrgasmDecided:
 					End If
 				Next
 			End If
-		End If
-		If String.IsNullOrEmpty(ssh.VideoGenre) Then
-			ssh.VideoGenre = "ALL"
-		End If
-		If VideoCheckInput Then
-			ssh.VideoCheck = True
-			RandomVideo()
-			If ssh.NoVideo Then
-				ssh.FileGoto = "No " + ssh.VideoGenre + " Videos Found"
-			Else
-				ssh.FileGoto = ssh.VideoGenre + " Videos Found"
+			If String.IsNullOrEmpty(ssh.VideoGenre) Then
+				ssh.VideoGenre = "ALL"
 			End If
-			ssh.VideoCheck = False
-			ssh.NoVideo = False
-			ssh.SkipGotoLine = True
-			GetGoto()
-		Else
-			If VideoRandomInput OrElse String.IsNullOrEmpty(VideoSelectInput) Then
-				ssh.RandomizerVideo = True
+			If VideoCheckInput Then
+				ssh.VideoCheck = True
 				RandomVideo()
-			Else
-				selectVideo(VideoSelectInput)
-			End If
-			If Not ssh.NoVideo Then
-				If VideoStopInput Then
-					ssh.TeaseVideo = True
+				If ssh.NoVideo Then
+					ssh.FileGoto = "No " + ssh.VideoGenre + " Videos Found"
+				Else
+					ssh.FileGoto = ssh.VideoGenre + " Videos Found"
 				End If
-				If VidInt > 0 Then
-					ssh.VideoTick = VidInt
-					VideoTimer.Start()
-				End If
-				While DomWMP.playState <> WMPPlayState.wmppsPlaying
-					Application.DoEvents()
-				End While
+				ssh.VideoCheck = False
+				ssh.NoVideo = False
+				ssh.SkipGotoLine = True
+				GetGoto()
 			Else
-				MessageBox.Show(Me, "No videos were found !", "Error !", MessageBoxButtons.OK, MessageBoxIcon.Hand)
+				If VideoRandomInput OrElse String.IsNullOrEmpty(VideoSelectInput) Then
+					ssh.RandomizerVideo = True
+					RandomVideo()
+				Else
+					selectVideo(VideoSelectInput)
+				End If
+				If Not ssh.NoVideo Then
+					If VideoStopInput Then
+						ssh.TeaseVideo = True
+					End If
+					If VidInt > 0 Then
+						ssh.VideoTick = VidInt
+						VideoTimer.Start()
+					End If
+					While DomWMP.playState <> WMPPlayState.wmppsPlaying
+						Application.DoEvents()
+					End While
+				Else
+					MessageBox.Show(Me, "No videos were found !", "Error !", MessageBoxButtons.OK, MessageBoxIcon.Hand)
+				End If
+				ssh.RandomizerVideo = False
 			End If
-			ssh.RandomizerVideo = False
 		End If
 		If StringClean.Contains("@Force") Then
 			StringClean = StringClean.Replace("@Force", "")
@@ -10431,29 +10436,199 @@ OrgasmDecided:
 					 "Please make sure the file exists and that it is spelled correctly in the script.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand)
 				End If
 			End If
-ExternalAudio:
+
 			StringClean = StringClean.Replace("@PlayAudio[" & AudioFlag & "]", "")
 		End If
-
-		If StringClean.Contains("@JumpVideo") Then
-
-			If (DomWMP.playState = WMPLib.WMPPlayState.wmppsPlaying) Then
-				Dim VideoLength As Integer = DomWMP.currentMedia.duration
-				Dim VidLow As Integer = VideoLength * 0.4
-				Dim VidHigh As Integer = VideoLength * 0.9
-				Dim VidPoint As Integer = ssh.randomizer.Next(VidLow, VidHigh)
-
-				Debug.Print("VidLow = " & VidLow)
-				Debug.Print("VidHigh = " & VidHigh)
-				Debug.Print("VidPoint = " & VidPoint)
-
-				DomWMP.Ctlcontrols.currentPosition = VideoLength - VidPoint
-
+		If StringClean.Contains("@PlayAudioNoWait[") Then
+			Dim AudioFlag As String = GetParentheses(StringClean, "@PlayAudioNoWait[")
+			' Github Patch Dim AudioClean As String = Application.StartupPath & "\Video\" & AudioFlag
+			Dim AudioClean As String
+			Dim canPlay As Boolean = False
+			If AudioFlag.Contains(":\") Then
+				AudioClean = AudioFlag
+			Else
+				AudioClean = Application.StartupPath & "\Audio\" & AudioFlag
+				AudioClean = AudioClean.Replace("\\", "\")
 			End If
-			StringClean = StringClean.Replace("@JumpVideo", "")
+
+			If AudioClean.Contains("*") Then
+
+				Dim AudioList As New List(Of String)
+
+				For Each foundFile As String In My.Computer.FileSystem.GetFiles(Path.GetDirectoryName(AudioClean), FileIO.SearchOption.SearchTopLevelOnly, Path.GetFileName(AudioClean))
+					AudioList.Add(foundFile)
+				Next
+
+				If AudioList.Count > 0 Then
+					contextWMP.URL = AudioList(ssh.randomizer.Next(0, AudioList.Count))
+					canPlay = True
+				Else
+					MessageBox.Show(Me, "No audio files matching " & Path.GetFileName(AudioClean) & " were found in " & Path.GetDirectoryName(AudioClean) & "!" & Environment.NewLine & Environment.NewLine &
+					  "Please make sure that valid files exist and that the wildcards are applied correctly in the script.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand)
+				End If
+			Else
+				If File.Exists(AudioClean) Then
+					contextWMP.URL = AudioClean
+					canPlay = True
+				Else
+					MessageBox.Show(Me, Path.GetFileName(AudioClean) & " was not found in " & Application.StartupPath & "\Audio!" & Environment.NewLine & Environment.NewLine &
+					 "Please make sure the file exists and that it is spelled correctly in the script.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand)
+				End If
+			End If
+
+			StringClean = StringClean.Replace("@PlayAudioNoWait[" & AudioFlag & "]", "")
+			Dim sw As New Stopwatch()
+
+			While canPlay AndAlso contextWMP.playState <> WMPPlayState.wmppsPlaying
+				If Not sw.IsRunning Then sw.Start()
+				Application.DoEvents() ' dubious infinite loop
+				If sw.ElapsedMilliseconds > 5000 Then
+					Exit While
+				End If
+			End While
+
 		End If
+		If StringClean.Contains("@StopAudio") Then
+			If contextWMP.playState = WMPPlayState.wmppsPlaying OrElse contextWMP.playState = WMPPlayState.wmppsPaused Then
+				contextWMP.Ctlcontrols.stop()
+				contextWMP.currentPlaylist.clear()
+			End If
+			If voiceDomWMP.playState = WMPPlayState.wmppsPlaying OrElse voiceDomWMP.playState = WMPPlayState.wmppsPaused Then
+				voiceDomWMP.Ctlcontrols.stop()
+				voiceDomWMP.currentPlaylist.clear()
+			End If
+			StringClean = StringClean.Replace("@StopAudio", "")
+		End If
+		If StringClean.Contains("@PlayAudioNoWaitVoiceDom[") Then
+			Dim AudioFlag As String = GetParentheses(StringClean, "@PlayAudioNoWaitVoiceDom[")
+			' Github Patch Dim AudioClean As String = Application.StartupPath & "\Video\" & AudioFlag
+			Dim AudioClean As String
+			Dim canPlay As Boolean = False
+			If AudioFlag.Contains(":\") Then
+				AudioClean = AudioFlag
+			Else
+				AudioClean = Application.StartupPath & "\Audio\" & AudioFlag
+				AudioClean = AudioClean.Replace("\\", "\")
+			End If
 
+			If AudioClean.Contains("*") Then
 
+				Dim AudioList As New List(Of String)
+
+				For Each foundFile As String In My.Computer.FileSystem.GetFiles(Path.GetDirectoryName(AudioClean), FileIO.SearchOption.SearchTopLevelOnly, Path.GetFileName(AudioClean))
+					AudioList.Add(foundFile)
+				Next
+
+				If AudioList.Count > 0 Then
+					voiceDomWMP.URL = AudioList(ssh.randomizer.Next(0, AudioList.Count))
+					canPlay = True
+				Else
+					MessageBox.Show(Me, "No audio files matching " & Path.GetFileName(AudioClean) & " were found in " & Path.GetDirectoryName(AudioClean) & "!" & Environment.NewLine & Environment.NewLine &
+					  "Please make sure that valid files exist and that the wildcards are applied correctly in the script.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand)
+				End If
+			Else
+				If File.Exists(AudioClean) Then
+					voiceDomWMP.URL = AudioClean
+					canPlay = True
+				Else
+					MessageBox.Show(Me, Path.GetFileName(AudioClean) & " was not found in " & Application.StartupPath & "\Audio!" & Environment.NewLine & Environment.NewLine &
+					 "Please make sure the file exists and that it is spelled correctly in the script.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand)
+				End If
+			End If
+
+			StringClean = StringClean.Replace("@PlayAudioNoWaitVoiceDom[" & AudioFlag & "]", "")
+		End If
+		If StringClean.Contains("@StopAudioVoiceDom") Then
+			If voiceDomWMP.playState = WMPPlayState.wmppsPlaying OrElse voiceDomWMP.playState = WMPPlayState.wmppsPaused Then
+				voiceDomWMP.Ctlcontrols.stop()
+				voiceDomWMP.currentPlaylist.clear()
+			End If
+			StringClean = StringClean.Replace("@StopAudioVoiceDom", "")
+		End If
+		If StringClean.Contains("@JumpVideoUp") Then
+			If StringClean.Contains("@JumpVideoUp(") Then
+				Dim jumpFlag As String = GetParentheses(StringClean, "@JumpVideoUp(")
+				If (jumpFlag <> 0) Then
+					ssh.JumpPercentVid = Convert.ToInt32(jumpFlag)
+				Else
+					ssh.JumpPercentVid = 0
+				End If
+				StringClean = StringClean.Replace("@JumpVideoUp(" & jumpFlag & ")", "")
+			Else
+				StringClean = StringClean.Replace("@JumpVideoUp", "")
+			End If
+			Jump2Random(Nothing, Nothing, Up:=True)
+		End If
+		If StringClean.Contains("@JumpVideoDown") Then
+			If StringClean.Contains("@JumpVideoDown(") Then
+				Dim jumpFlag As String = GetParentheses(StringClean, "@JumpVideoDown(")
+				If (jumpFlag <> 0) Then
+					ssh.JumpPercentVid = Convert.ToInt32(jumpFlag)
+				Else
+					ssh.JumpPercentVid = 0
+				End If
+				StringClean = StringClean.Replace("@JumpVideoDown(" & jumpFlag & ")", "")
+			Else
+				StringClean = StringClean.Replace("@JumpVideoDown", "")
+			End If
+			Jump2Random(Nothing, Nothing, Down:=True)
+		End If
+		If StringClean.Contains("@JumpVideo") Then
+			If StringClean.Contains("@JumpVideo(") Then
+				Dim jumpFlag As String = GetParentheses(StringClean, "@JumpVideo(")
+				If (jumpFlag <> 0) Then
+					ssh.JumpPercentVid = Convert.ToInt32(jumpFlag)
+				Else
+					ssh.JumpPercentVid = 0
+				End If
+				StringClean = StringClean.Replace("@JumpVideo(" & jumpFlag & ")", "")
+			Else
+				StringClean = StringClean.Replace("@JumpVideo", "")
+			End If
+			Jump2Random(Nothing, Nothing)
+		End If
+		If StringClean.Contains("@JumpAudioUp") Then
+			If StringClean.Contains("@JumpAudioUp(") Then
+				Dim jumpFlag As String = GetParentheses(StringClean, "@JumpAudioUp(")
+				If (jumpFlag <> 0) Then
+					ssh.JumpPercentAudio = Convert.ToInt32(jumpFlag)
+				Else
+					ssh.JumpPercentAudio = 0
+				End If
+				StringClean = StringClean.Replace("@JumpAudioUp(" & jumpFlag & ")", "")
+			Else
+				StringClean = StringClean.Replace("@JumpAudioUp", "")
+			End If
+			Jump2Random(Nothing, Nothing, Up:=True, Audio:=True)
+		End If
+		If StringClean.Contains("@JumpAudioDown") Then
+			If StringClean.Contains("@JumpAudioDown(") Then
+				Dim jumpFlag As String = GetParentheses(StringClean, "@JumpAudioDown(")
+				If (jumpFlag <> 0) Then
+					ssh.JumpPercentAudio = Convert.ToInt32(jumpFlag)
+				Else
+					ssh.JumpPercentAudio = 0
+				End If
+				StringClean = StringClean.Replace("@JumpAudioDown(" & jumpFlag & ")", "")
+			Else
+				StringClean = StringClean.Replace("@JumpAudioDown", "")
+			End If
+			Jump2Random(Nothing, Nothing, Down:=True, Audio:=True)
+		End If
+		If StringClean.Contains("@JumpAudio") Then
+			If StringClean.Contains("@JumpAudio(") Then
+				Dim jumpFlag As String = GetParentheses(StringClean, "@JumpAudio(")
+				If (jumpFlag <> 0) Then
+					ssh.JumpPercentAudio = Convert.ToInt32(jumpFlag)
+				Else
+					ssh.JumpPercentAudio = 0
+				End If
+				StringClean = StringClean.Replace("@JumpAudio(" & jumpFlag & ")", "")
+			Else
+				StringClean = StringClean.Replace("@JumpAudio", "")
+			End If
+			Jump2Random(Nothing, Nothing, Audio:=True)
+		End If
 		If StringClean.Contains("@AddStrokeTime(") Then
 
 			Dim OriginalFlag As String = ""

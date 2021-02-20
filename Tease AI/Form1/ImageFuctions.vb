@@ -300,7 +300,7 @@ exitEmpty:
 				If tmpList.Count <= 0 Then GoTo NoneFound
 
 				' Pick a Random Image-Path
-				Return tmpList(New Random().Next(0, tmpList.Count))
+				Return tmpList(Form1.ssh.randomizer.Next(0, tmpList.Count))
 			Catch ex As Exception
 				'▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
 				'						       All Errors
@@ -330,7 +330,7 @@ NoneFound:
 				If tmpList.Count <= 0 Then GoTo NoneFound
 
 				' Pick a Random Image-Path
-				Return tmpList(New Random().Next(0, tmpList.Count))
+				Return tmpList(Form1.ssh.randomizer.Next(0, tmpList.Count))
 			Catch ex As Exception
 				'▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
 				'						       All Errors
