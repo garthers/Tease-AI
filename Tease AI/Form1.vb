@@ -12428,7 +12428,7 @@ VTSkip:
 
 	Public Sub EdgePace()
 
-		StrokePace = ssh.randomizer.Next(NBMaxPace.Value, NBMaxPace.Value + 151)
+		StrokePace = ssh.randomizer.Next(NBMaxPace.Value, NBMaxPace.Value + 171)
 		If StrokePace > NBMinPace.Value Then StrokePace = NBMinPace.Value
 		StrokePace = 50 * Math.Round(StrokePace / 50)
 
