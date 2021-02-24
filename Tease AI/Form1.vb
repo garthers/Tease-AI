@@ -3848,7 +3848,7 @@ SkipIsTyping:
 				If ssh.GlitterTease AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.LockImage Then GoTo TryNextWithTease
 
 
-				If FrmSettings.teaseRadio.Checked AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.LockImage AndAlso Not ssh.TeaseVideo = False AndAlso Not ssh.DomTask.Contains("@NewBlogImage") AndAlso Not ssh.NullResponse _
+				If FrmSettings.teaseRadio.Checked AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.LockImage AndAlso Not ssh.TeaseVideo AndAlso Not ssh.DomTask.Contains("@NewBlogImage") AndAlso Not ssh.NullResponse _
 				  AndAlso ssh.SlideshowLoaded AndAlso Not ssh.DomTask.Contains("@ShowButtImage") AndAlso Not ssh.DomTask.Contains("@ShowBoobsImage") AndAlso Not ssh.DomTask.Contains("@ShowButtsImage") _
 				  AndAlso Not ssh.DomTask.Contains("@ShowBoobsImage") AndAlso Not ssh.LockImage AndAlso Not ssh.CustomSlideEnabled AndAlso Not ssh.RapidFire _
 				  AndAlso UCase(ssh.DomTask) <> "@SystemMessage Tease AI has been reset" AndAlso Not ssh.JustShowedSlideshowImage AndAlso Not ssh.MultiTauntPictureHold Then
