@@ -59,11 +59,11 @@ Public Class ContactData
 
 	Public ReadOnly Property ShortName As String
 		Get
-			If Contact = ContactType.Domme Then
-				Return My.Settings.GlitterSN
-			Else
-				Return TypeName
-			End If
+			'If Contact = ContactType.Domme Then
+			'Return My.Settings.GlitterSN
+			'Else
+			Return TypeName
+			'End If
 		End Get
 	End Property
 	Public ReadOnly Property TypeColorHtml As String
@@ -94,7 +94,8 @@ Public Class ContactData
 
 	Public ReadOnly Property TTSvoice As String
 		Get
-			Throw New NotImplementedException("Not implemented yet.")
+			'Throw New NotImplementedException("Not implemented yet.")
+			Return "Not implemented yet."
 		End Get
 	End Property
 
@@ -259,31 +260,6 @@ checkFolder:
 		If Directory.Exists(baseDirectory) = False Then _
 			Throw New DirectoryNotFoundException("The given slideshow base diretory """ & baseDirectory & """ was not found.")
 	Dim currPath As String
-#If False Then
-					string currPath = "";
-			currPath = ((!(Contact == ContactType.Random && !newFolder)) ? baseDirectory : (tempBaseFolder = myDirectory.GetDirectories(baseDirectory).ElementAt(MyProject.Forms.Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count()))));
-			while ((currPath.Contains("#Contact") & (Contact == ContactType.Random)) | (currPath.Contains(MyProject.Forms.FrmSettings.TbxDomImageDir.Text) & (Contact == ContactType.Random)))
-			{
-				currPath = ((!(Contact == ContactType.Random && !newFolder)) ? baseDirectory : (tempBaseFolder = myDirectory.GetDirectories(baseDirectory).ElementAt(MyProject.Forms.Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count()))));
-			}
-			List<string> subDirs = myDirectory.GetDirectories(currPath).ToList();
-			if (subDirs.Contains(MySettingsProperty.Settings.DomImageDirRand))
-			{
-				subDirs.Remove(MySettingsProperty.Settings.DomImageDirRand);
-			}
-			List<string> dirListToExclude = new List<string>();
-			foreach (string tempDir in subDirs)
-			{
-				if (Operators.CompareString(Conversions.ToString(tempDir.Substring(checked(tempDir.LastIndexOf("\\") + 1)).ElementAt(0)), "#", TextCompare: false) == 0)
-				{
-					dirListToExclude.Add(tempDir);
-				}
-			}
-			foreach (string tempDir in dirListToExclude)
-			{
-				subDirs.Remove(tempDir);
-			}
-#End If
 		If Contact = ContactType.Random And Not newFolder Then
 			currPath = myDirectory.GetDirectories(baseDirectory).ElementAt(Form1.ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count))
 			tempBaseFolder = currPath
@@ -316,7 +292,7 @@ checkFolder:
 
 
 		' Read all subdirectories in base folder.
-		subDirs = myDirectory.GetDirectories(currPath).ToList
+		'subDirs = myDirectory.GetDirectories(currPath).ToList
 		Dim exclude As New List(Of String)
 nextSubDir:
 		' Check if there are folders left.

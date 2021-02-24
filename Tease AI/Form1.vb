@@ -3848,7 +3848,7 @@ SkipIsTyping:
 				If ssh.GlitterTease AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.LockImage Then GoTo TryNextWithTease
 
 
-				If FrmSettings.teaseRadio.Checked AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.TeaseVideo = False AndAlso Not ssh.DomTask.Contains("@NewBlogImage") AndAlso Not ssh.NullResponse _
+				If FrmSettings.teaseRadio.Checked AndAlso Not ssh.JustShowedBlogImage AndAlso Not ssh.LockImage AndAlso Not ssh.TeaseVideo = False AndAlso Not ssh.DomTask.Contains("@NewBlogImage") AndAlso Not ssh.NullResponse _
 				  AndAlso ssh.SlideshowLoaded AndAlso Not ssh.DomTask.Contains("@ShowButtImage") AndAlso Not ssh.DomTask.Contains("@ShowBoobsImage") AndAlso Not ssh.DomTask.Contains("@ShowButtsImage") _
 				  AndAlso Not ssh.DomTask.Contains("@ShowBoobsImage") AndAlso Not ssh.LockImage AndAlso Not ssh.CustomSlideEnabled AndAlso Not ssh.RapidFire _
 				  AndAlso UCase(ssh.DomTask) <> "@SystemMessage Tease AI has been reset" AndAlso Not ssh.JustShowedSlideshowImage AndAlso Not ssh.MultiTauntPictureHold Then
@@ -5743,6 +5743,10 @@ SkipSpecialD:
 		'======================================================================================
 		If My.Settings.CBGeneralD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("GENERAD")) Then _
    __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoGeneralD))
+
+		If __TotalFiles.Count = 0 Then
+			Debug.Print("No files for genre " & ssh.VideoGenre)
+		End If
 
 		If Not ssh.VideoCheck OrElse ssh.VideoGenre = "" Then
 			ssh.VideoGenre = "ALL"
@@ -10231,8 +10235,8 @@ OrgasmDecided:
 				'AvoidTheEdgeStroking = True
 				ssh.RLGLGame = True
 
-				ssh.ScriptVideoTeaseFlag = False
-				ssh.VideoTease = True
+				'ssh.ScriptVideoTeaseFlag = False
+				'ssh.VideoTease = True
 				ssh.RLGLTick = ssh.randomizer.Next(FrmSettings.NBGreenLightMin.Value, FrmSettings.NBGreenLightMax.Value + 1)
 				RLGLTimer.Start()
 				ssh.StartStrokingCount += 1
@@ -10332,28 +10336,28 @@ OrgasmDecided:
 						If UCase(VideoFlagArray(i)).Contains("M") Then VidInt *= 60
 					End If
 					Dim temp As String = ""
-					If String.Compare(VideoFlagArray(i), "HARDCORE") = 0 Then temp = "HARDCORE"
-					If String.Compare(VideoFlagArray(i), "SOFTCORE") = 0 Then temp = "SOFTCORE"
-					If String.Compare(VideoFlagArray(i), "LESBIAN") = 0 Then temp = "LESBIAN"
-					If String.Compare(VideoFlagArray(i), "BLOWJOB") = 0 Then temp = "BLOWJOB"
-					If String.Compare(VideoFlagArray(i), "FEMDOM") = 0 Then temp = "FEMDOM"
-					If String.Compare(VideoFlagArray(i), "FEMSUB") = 0 Then temp = "FEMSUB"
-					If String.Compare(VideoFlagArray(i), "JOI") = 0 Then temp = "JOI"
-					If String.Compare(VideoFlagArray(i), "CH") = 0 Then temp = "CH"
-					If String.Compare(VideoFlagArray(i), "GENERAL") = 0 Then temp = "GENERAL"
+					If String.Compare(VideoFlagArray(i), "HARDCORE", True) = 0 Then temp = "HARDCORE"
+					If String.Compare(VideoFlagArray(i), "SOFTCORE", True) = 0 Then temp = "SOFTCORE"
+					If String.Compare(VideoFlagArray(i), "LESBIAN", True) = 0 Then temp = "LESBIAN"
+					If String.Compare(VideoFlagArray(i), "BLOWJOB", True) = 0 Then temp = "BLOWJOB"
+					If String.Compare(VideoFlagArray(i), "FEMDOM", True) = 0 Then temp = "FEMDOM"
+					If String.Compare(VideoFlagArray(i), "FEMSUB", True) = 0 Then temp = "FEMSUB"
+					If String.Compare(VideoFlagArray(i), "JOI", True) = 0 Then temp = "JOI"
+					If String.Compare(VideoFlagArray(i), "CH", True) = 0 Then temp = "CH"
+					If String.Compare(VideoFlagArray(i), "GENERAL", True) = 0 Then temp = "GENERAL"
 
-					If String.Compare(VideoFlagArray(i), "HARDCORE DOMME") = 0 Then temp = "HARDCORD"
-					If String.Compare(VideoFlagArray(i), "SOFTCORE DOMME") = 0 Then temp = "SOFTCORD"
-					If String.Compare(VideoFlagArray(i), "LESBIAN DOMME") = 0 Then temp = "LESBIAD"
-					If String.Compare(VideoFlagArray(i), "BLOWJOB DOMME") = 0 Then temp = "BLOWJOD"
-					If String.Compare(VideoFlagArray(i), "FEMDOM DOMME") = 0 Then temp = "FEMDOD"
-					If String.Compare(VideoFlagArray(i), "FEMSUB DOMME") = 0 Then temp = "FEMSUD"
-					If String.Compare(VideoFlagArray(i), "JOI DOMME") = 0 Then temp = "JOD"
-					If String.Compare(VideoFlagArray(i), "CH DOMME") = 0 Then temp = "CD"
-					If String.Compare(VideoFlagArray(i), "GENERAL DOMME") = 0 Then temp = "GENERAD"
+					If String.Compare(VideoFlagArray(i), "HARDCORE DOMME", True) = 0 Then temp = "HARDCORD"
+					If String.Compare(VideoFlagArray(i), "SOFTCORE DOMME", True) = 0 Then temp = "SOFTCORD"
+					If String.Compare(VideoFlagArray(i), "LESBIAN DOMME", True) = 0 Then temp = "LESBIAD"
+					If String.Compare(VideoFlagArray(i), "BLOWJOB DOMME", True) = 0 Then temp = "BLOWJOD"
+					If String.Compare(VideoFlagArray(i), "FEMDOM DOMME", True) = 0 Then temp = "FEMDOD"
+					If String.Compare(VideoFlagArray(i), "FEMSUB DOMME", True) = 0 Then temp = "FEMSUD"
+					If String.Compare(VideoFlagArray(i), "JOI DOMME", True) = 0 Then temp = "JOD"
+					If String.Compare(VideoFlagArray(i), "CH DOMME", True) = 0 Then temp = "CD"
+					If String.Compare(VideoFlagArray(i), "GENERAL DOMME", True) = 0 Then temp = "GENERAD"
 					If VideoCheckInput Then
 						ssh.VideoGenre = temp
-					Else
+					ElseIf Not String.IsNullOrEmpty(temp) Then
 						ssh.VideoGenre = ssh.VideoGenre & " " & temp
 					End If
 				Next
@@ -18787,12 +18791,12 @@ ReRoll:
 			'▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
 			'                                            All Errors
 			'▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
-			If sender IsNot Nothing Then
-				MsgBox("Error on jumping to Random Position in Media!" & vbCrLf & ex.Message,
+			'If sender IsNot Nothing Then
+			MsgBox("Error on jumping to Random Position in Media!" & vbCrLf & ex.Message,
 				  vbExclamation, "Jump to random Position")
-			Else
-				Throw
-			End If
+			'Else
+			'Throw
+			'End If
 		End Try
 	End Sub
 
@@ -20159,9 +20163,9 @@ ShowedBlogImage:
 		LBLWritingTaskText.Text = LBLWritingTaskText.Text.Trim
 	End Sub
 
-	Private Sub LoadCustomizedSlideshow(sender As Object, e As KeyEventArgs)
+	'Private Sub LoadCustomizedSlideshow(sender As Object, e As KeyEventArgs)
 
-	End Sub
+	'End Sub
 
 
 End Class
