@@ -1,7 +1,11 @@
 ﻿# Tease-AI
 Tease AI is adult-oriented software that aims to create an interactive tease and denial experience by emulating an online chat session with a domme. 
 
+# Changelog - Patch 56.0.0 (Sweet Patch 24 compatibility)
+Code is functionally equivalent to Sweet Patch v24.
+
 # Changelog - Patch 56.0.0
+
 	
 * Commands: 
 	* @SystemMessage: File and directory paths in SystemMessages are now links.
