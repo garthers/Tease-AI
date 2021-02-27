@@ -224,6 +224,7 @@ Public Class Form1
 		Dim enumerator As IEnumerator = Nothing
 		Dim GlitterScriptCount As Integer = 0
 		Dim LoginAmt As Integer = 0
+		InitPoundClean()
 		Try
 retryStart:
 			ssh.dommePresent = True
@@ -6765,6 +6766,23 @@ CensorConstant:
 
 	End Function
 
+	Private _reKeywords As Regex
+	Private _reKeywordsCI As Regex
+	Private _ts As TraceSwitch
+
+	Public Sub InitPoundClean()
+		' Create Regex-Pattern to find #Keywords and exclude custom imagetags.
+		Dim ExcludeKeywords As String() = {"TagGarment", "TagUnderwear", "TagTattoo", "TagSexToy", "TagFurniture"}
+		Dim Pattern As String = String.Format("##*(?!{0})[\w\d\+\-_]+", Join(ExcludeKeywords, "|"))
+
+		' Append included non-Keywords to pattern.
+		Dim NonKeywordInclude As String() = {"@RT\(", "@RandomText\("}
+		Pattern &= If(NonKeywordInclude.Length = 0, "", "|" & String.Join("|", NonKeywordInclude))
+
+		_reKeywords = New Regex(Pattern)
+		_reKeywordsCI = New Regex(Pattern, RegexOptions.IgnoreCase)
+		_ts = New TraceSwitch("PoundClean", "")
+	End Sub
 
 	Public Enum PoundOptions
 		None = 0
@@ -6777,7 +6795,7 @@ CensorConstant:
 
 		Dim AlreadyChecked As List(Of String) = New List(Of String)
 		Dim dotrace As Boolean = True
-		Dim TS As New TraceSwitch("PoundClean", "")
+		Dim TS As TraceSwitch = _ts
 		Dim StartTime As Date = Now
 
 		If dotrace Then
@@ -6797,17 +6815,7 @@ CensorConstant:
 		Dim OrgString As String = stringClean
 		Dim ActRecurrence As Integer = startRecurrence
 
-		' Create Regex-Pattern to find #Keywords and exclude custom imagetags.
-		Dim ExcludeKeywords As String() = {"TagGarment", "TagUnderwear", "TagTattoo", "TagSexToy", "TagFurniture"}
-		Dim Pattern As String = String.Format("##*(?!{0})[\w\d\+\-_]+", Join(ExcludeKeywords, "|"))
-
-		' Append included non-Keywords to pattern.
-		Dim NonKeywordInclude As String() = {"@RT\(", "@RandomText\("}
-		Pattern &= If(NonKeywordInclude.Length = 0, "", "|" & String.Join("|", NonKeywordInclude))
-
-		Dim RegexKeyWords As New Regex(Pattern)
-
-		Do While ActRecurrence < 6 AndAlso RegexKeyWords.IsMatch(stringClean)
+		Do While ActRecurrence < 6 AndAlso _reKeywords.IsMatch(stringClean)
 			ActRecurrence += 1
 
 			If dotrace Then
@@ -6822,9 +6830,7 @@ CensorConstant:
 				If TS.TraceVerbose Then Trace.WriteLine(String.Format("System keywords cleaned: ""{0}""", stringClean))
 			End If
 
-			' Find all remaining #Keywords.
-			Dim Re As New Regex(Pattern, RegexOptions.IgnoreCase)
-			Dim Mc As MatchCollection = Re.Matches(stringClean)
+			Dim Mc As MatchCollection = _reKeywordsCI.Matches(stringClean)
 
 			Dim ControlCustom As String = ""
 			If stringClean.Contains("@CustomMode(") Then
@@ -6908,7 +6914,7 @@ CensorConstant:
 			End If
 		Loop
 
-		If RegexKeyWords.IsMatch(stringClean) Then
+		If _reKeywords.IsMatch(stringClean) Then
 			If dotrace Then
 				If TS.TraceError Then
 					Trace.WriteLine("PoundClean(String): Stopping scan, maximum allowed scan depth reached.")
