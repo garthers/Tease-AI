@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.VisualBasic.ApplicationServices
+Imports Tai.Common
 
 Namespace My
 	' The following events are available for MyApplication:

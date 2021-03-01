@@ -2,6 +2,7 @@
 Imports System.IO
 Imports System.Speech.Synthesis
 Imports Tease_AI.URL_Files
+Imports Tai.Common
 
 
 
@@ -2721,7 +2722,7 @@ SkipDeserializing:
 		End Try
 	End Sub
 
-#End Region	' Scripts
+#End Region  ' Scripts
 
 #Region "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Apps ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
@@ -3119,7 +3120,7 @@ SkipDeserializing:
 		End If
 	End Sub
 
-#End Region	' Glitter
+#End Region  ' Glitter
 
 #Region "----------------------------------------- Games ------------------------------------------------"
 
@@ -3284,9 +3285,9 @@ SkipDeserializing:
 		End If
 	End Sub
 
-#End Region	' Games
+#End Region  ' Games
 
-#End Region	' Apps
+#End Region  ' Apps
 
 #Region "-------------------------------------- URL Files -----------------------------------------------"
 
@@ -3763,7 +3764,7 @@ TryNextImage:
 
 #End Region
 
-#End Region	' Url Files
+#End Region  ' Url Files
 
 #Region "--------------------------------------- Images -------------------------------------------------"
 
@@ -3816,8 +3817,8 @@ set_newFolder:
 		'							   Check folder content
 		'▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 checkFolder:
-		Dim count_top As Integer = myDirectory.GetFilesImages(rtnPath, SearchOption.TopDirectoryOnly).Count
-		Dim count_all As Integer = myDirectory.GetFilesImages(rtnPath, SearchOption.AllDirectories).Count
+		Dim count_top As Integer = DirectoryExt.GetFilesImages(rtnPath, SearchOption.TopDirectoryOnly).Count
+		Dim count_all As Integer = DirectoryExt.GetFilesImages(rtnPath, SearchOption.AllDirectories).Count
 
 		If count_top = 0 And count_all = 0 Then
 			' ================================= No images in folder ===============================
@@ -3880,7 +3881,7 @@ checkFolder:
 		Return My.Settings.CBIHardcore
 	End Function
 
-#End Region	' Hardcore
+#End Region ' Hardcore
 
 #Region "------------------------------------- Softcore Images -------------------------------------------"
 
@@ -3911,7 +3912,7 @@ checkFolder:
 		Return My.Settings.CBISoftcore
 	End Function
 
-#End Region	' Softcore
+#End Region ' Softcore
 
 #Region "------------------------------------- Lesbian Images --------------------------------------------"
 
@@ -3942,7 +3943,7 @@ checkFolder:
 		Return My.Settings.CBILesbian
 	End Function
 
-#End Region	' Lesbian
+#End Region ' Lesbian
 
 #Region "------------------------------------- Blowjob Images --------------------------------------------"
 
@@ -3973,7 +3974,7 @@ checkFolder:
 		Return My.Settings.CBIBlowjob
 	End Function
 
-#End Region	' Blowjob
+#End Region ' Blowjob
 
 #Region "------------------------------------- Femdom Images ---------------------------------------------"
 
@@ -4004,7 +4005,7 @@ checkFolder:
 		Return My.Settings.CBIFemdom
 	End Function
 
-#End Region	' Femdom
+#End Region ' Femdom
 
 #Region "------------------------------------- Lezdom Images ---------------------------------------------"
 
@@ -4035,7 +4036,7 @@ checkFolder:
 		Return My.Settings.CBILezdom
 	End Function
 
-#End Region	' Lezdon
+#End Region ' Lezdon
 
 #Region "------------------------------------- Hentai Images ---------------------------------------------"
 
@@ -4066,7 +4067,7 @@ checkFolder:
 		Return My.Settings.CBIHentai
 	End Function
 
-#End Region	' Hentai
+#End Region ' Hentai
 
 #Region "------------------------------------- Gay Images ------------------------------------------------"
 
@@ -4097,7 +4098,7 @@ checkFolder:
 		Return My.Settings.CBIGay
 	End Function
 
-#End Region	' Gay
+#End Region ' Gay
 
 #Region "------------------------------------- Maledom Images ---------------------------------------------"
 
@@ -4128,7 +4129,7 @@ checkFolder:
 		Return My.Settings.CBIMaledom
 	End Function
 
-#End Region	' Maledom
+#End Region ' Maledom
 
 #Region "------------------------------------- General Images ---------------------------------------------"
 
@@ -4159,7 +4160,7 @@ checkFolder:
 		Return My.Settings.CBIGeneral
 	End Function
 
-#End Region	' General
+#End Region ' General
 
 #Region "------------------------------------- Captions Images ---------------------------------------------"
 
@@ -4190,7 +4191,7 @@ checkFolder:
 		Return My.Settings.CBICaptions
 	End Function
 
-#End Region	' Captions
+#End Region ' Captions
 
 #Region "------------------------------------- Boobs Images ----------------------------------------------"
 
@@ -4221,7 +4222,7 @@ checkFolder:
 		Return My.Settings.CBIBoobs
 	End Function
 
-#End Region	' Boobs
+#End Region ' Boobs
 
 #Region "------------------------------------- Butts Images ----------------------------------------------"
 
@@ -4252,7 +4253,7 @@ checkFolder:
 		Return My.Settings.CBIButts
 	End Function
 
-#End Region	' Butt
+#End Region ' Butt
 
 
 	Private Sub LBLIHardcore_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TbxIHardcore.DoubleClick
@@ -4417,9 +4418,9 @@ checkFolder:
 		End Try
 	End Sub
 
-#End Region	'GenreImages-Url-Files
+#End Region  'GenreImages-Url-Files
 
-#End Region	' Images
+#End Region  ' Images
 
 #Region "--------------------------------------- Videos -------------------------------------------------"
 
@@ -4519,10 +4520,10 @@ checkFolder:
 
 	Friend Shared Function VideoHardcore_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoHardcore_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoHardcore).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoHardcore).Count
 	End Function
 
-#End Region	' Hardcore
+#End Region ' Hardcore
 
 #Region "------------------------------------- Softcore Videos -------------------------------------------"
 
@@ -4548,10 +4549,10 @@ checkFolder:
 
 	Friend Shared Function VideoSoftcore_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoSoftcore_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoSoftcore).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoSoftcore).Count
 	End Function
 
-#End Region	' Softcore
+#End Region ' Softcore
 
 #Region "------------------------------------- Lesbian Videos --------------------------------------------"
 
@@ -4577,10 +4578,10 @@ checkFolder:
 
 	Friend Shared Function VideoLesbian_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoLesbian_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoLesbian).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoLesbian).Count
 	End Function
 
-#End Region	' Lesbian
+#End Region ' Lesbian
 
 #Region "------------------------------------- Blowjob Videos --------------------------------------------"
 
@@ -4606,10 +4607,10 @@ checkFolder:
 
 	Friend Shared Function VideoBlowjob_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoBlowjob_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoBlowjob).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoBlowjob).Count
 	End Function
 
-#End Region	' Blowjob
+#End Region ' Blowjob
 
 #Region "---------------------------------------- Femdom -------------------------------------------------"
 
@@ -4635,10 +4636,10 @@ checkFolder:
 
 	Friend Shared Function VideoFemdom_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoFemdom_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoFemdom).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoFemdom).Count
 	End Function
 
-#End Region	' Femdom
+#End Region ' Femdom
 
 #Region "------------------------------------- Femsub Videos ---------------------------------------------"
 
@@ -4664,10 +4665,10 @@ checkFolder:
 
 	Friend Shared Function VideoFemsub_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoFemsub_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoFemsub).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoFemsub).Count
 	End Function
 
-#End Region	' Femsub
+#End Region ' Femsub
 
 #Region "------------------------------------- JOI Videos ------------------------------------------------"
 
@@ -4693,10 +4694,10 @@ checkFolder:
 
 	Friend Shared Function VideoJOI_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoJOI_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoJOI).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoJOI).Count
 	End Function
 
-#End Region	' JOI
+#End Region ' JOI
 
 #Region "------------------------------------- CH Videos -------------------------------------------------"
 
@@ -4722,10 +4723,10 @@ checkFolder:
 
 	Friend Shared Function VideoCH_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoCH_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoCH).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoCH).Count
 	End Function
 
-#End Region	' CH
+#End Region ' CH
 
 #Region "------------------------------------- General Videos --------------------------------------------"
 
@@ -4751,12 +4752,12 @@ checkFolder:
 
 	Friend Shared Function VideoGeneral_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoGeneral_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoGeneral).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoGeneral).Count
 	End Function
 
-#End Region	' General
+#End Region ' General
 
-#End Region	' Regular
+#End Region ' Regular
 
 #Region "------------------------------------------ Domme ------------------------------------------------"
 
@@ -4784,10 +4785,10 @@ checkFolder:
 
 	Friend Shared Function VideoHardcoreD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoHardcoreD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoHardcoreD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoHardcoreD).Count
 	End Function
 
-#End Region	' HardcoreD
+#End Region ' HardcoreD
 
 #Region "---------------------------------------- SoftcoreD ----------------------------------------------"
 
@@ -4813,10 +4814,10 @@ checkFolder:
 
 	Friend Shared Function VideoSoftcoreD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoSoftcoreD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoSoftcoreD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoSoftcoreD).Count
 	End Function
 
-#End Region	' SoftcoreD
+#End Region ' SoftcoreD
 
 #Region "---------------------------------------- LesbianD -----------------------------------------------"
 
@@ -4842,10 +4843,10 @@ checkFolder:
 
 	Friend Shared Function VideoLesbianD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoLesbianD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoLesbianD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoLesbianD).Count
 	End Function
 
-#End Region	' LesbianD
+#End Region ' LesbianD
 
 #Region "---------------------------------------- BlowjobD -----------------------------------------------"
 
@@ -4871,10 +4872,10 @@ checkFolder:
 
 	Friend Shared Function VideoBlowjobD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoBlowjobD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoBlowjobD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoBlowjobD).Count
 	End Function
 
-#End Region	' BlowjobD
+#End Region ' BlowjobD
 
 #Region "---------------------------------------- FemdomD ------------------------------------------------"
 
@@ -4900,10 +4901,10 @@ checkFolder:
 
 	Friend Shared Function VideoFemdomD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoFemdomD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoFemdomD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoFemdomD).Count
 	End Function
 
-#End Region	' FemdomD
+#End Region ' FemdomD
 
 #Region "---------------------------------------- FemsubD ------------------------------------------------"
 
@@ -4929,10 +4930,10 @@ checkFolder:
 
 	Friend Shared Function VideoFemsubD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoFemsubD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoFemsubD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoFemsubD).Count
 	End Function
 
-#End Region	' FemsubD
+#End Region ' FemsubD
 
 #Region "---------------------------------------- JOI-D --------------------------------------------------"
 
@@ -4958,10 +4959,10 @@ checkFolder:
 
 	Friend Shared Function VideoJOID_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoJOID_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoJOID).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoJOID).Count
 	End Function
 
-#End Region	' JOI-D
+#End Region ' JOI-D
 
 #Region "---------------------------------------- CH-D ---------------------------------------------------"
 
@@ -4987,10 +4988,10 @@ checkFolder:
 
 	Friend Shared Function VideoCHD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoCHD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoCHD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoCHD).Count
 	End Function
 
-#End Region	' CH-D
+#End Region ' CH-D
 
 #Region "---------------------------------------- GeneralD -----------------------------------------------"
 
@@ -5016,19 +5017,19 @@ checkFolder:
 
 	Friend Shared Function VideoGeneralD_Count(Optional ByVal checkfolder As Boolean = True) As Integer
 		If checkfolder Then VideoGeneralD_CheckFolder()
-		Return myDirectory.GetFilesVideo(My.Settings.VideoGeneralD).Count
+		Return DirectoryExt.GetFilesVideo(My.Settings.VideoGeneralD).Count
 	End Function
 
-#End Region	' GeneralD
+#End Region ' GeneralD
 
-#End Region	' Domme
+#End Region ' Domme
 
 	Private Sub BTNRefreshVideos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BTNRefreshVideos.Click
 		VideoDescriptionLabel.Text = "Refresh complete: " & Video_CheckAllFolders() & " videos found!"
 		VideoDescriptionLabel.Text = VideoDescriptionLabel.Text.Replace(": 1 videos", ": 1 video")
 	End Sub
 
-#End Region	' Videos
+#End Region  ' Videos
 
 
 	Private Sub BindCombo()
@@ -6043,22 +6044,22 @@ checkFolder:
 
 	Private Sub TBGreeting_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBGreeting.LostFocus
 		My.Settings.SubGreeting = TBGreeting.Text
-		Ssh.checkAnswers = New subAnswers(Ssh)
+		Ssh.checkAnswers = New subAnswers()
 	End Sub
 
 	Private Sub TBYes_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBYes.LostFocus
 		My.Settings.SubYes = TBYes.Text
-		Ssh.checkAnswers = New subAnswers(Ssh)
+		Ssh.checkAnswers = New subAnswers()
 	End Sub
 
 	Private Sub TBNo_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBNo.LostFocus
 		My.Settings.SubNo = TBNo.Text
-		Ssh.checkAnswers = New subAnswers(Ssh)
+		Ssh.checkAnswers = New subAnswers()
 	End Sub
 
 	Private Sub TBSorry_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBSorry.LostFocus
 		My.Settings.SubSorry = TBSorry.Text
-		Ssh.checkAnswers = New subAnswers(Ssh)
+		Ssh.checkAnswers = New subAnswers()
 	End Sub
 
 	Private Sub TBHonorific_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBHonorific.LostFocus
@@ -10153,13 +10154,14 @@ checkFolder:
 
 		Dim ValidateCount As Integer
 
-		For Each Dir As String In myDirectory.GetDirectories(Application.StartupPath & "\Scripts\")
+		Dim dirList As String() = DirectoryExt.GetDirectories(Application.StartupPath & "\Scripts\")
+		For Each dirName As String In dirList
 			For Each foundFile As String In My.Computer.FileSystem.GetFiles(Application.StartupPath & "\System\System Files\", FileIO.SearchOption.SearchAllSubDirectories, "*.*")
-				If Not File.Exists(Dir & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", "")) Then
-					If Not System.IO.Directory.Exists(Path.GetDirectoryName(Dir & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", ""))) Then
-						System.IO.Directory.CreateDirectory(Path.GetDirectoryName(Dir & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", "")))
+				If Not File.Exists(dirName & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", "")) Then
+					If Not System.IO.Directory.Exists(Path.GetDirectoryName(dirName & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", ""))) Then
+						System.IO.Directory.CreateDirectory(Path.GetDirectoryName(dirName & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", "")))
 					End If
-					System.IO.File.Copy(foundFile, Dir & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", ""))
+					System.IO.File.Copy(foundFile, dirName & "\" & foundFile.Replace(Application.StartupPath & "\System\System Files\", ""))
 					ValidateCount += 1
 				End If
 			Next

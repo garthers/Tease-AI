@@ -1,6 +1,7 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
-  <Profiles />
+﻿<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles >
+ <Profile Name="(Default)" />
+  </Profiles>
   <Settings>
     <Setting Name="VideoHardcore" Type="System.String" Scope="User">
       <Value Profile="(Default)">No path selected</Value>
@@ -1474,7 +1475,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SplitterPosition" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">423</Value>
+      <Value Profile="(Default)">471</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -7,7 +7,7 @@ Imports System.Speech.Synthesis
 Imports System.Speech.AudioFormat
 Imports System.Drawing.Drawing2D
 Imports System.Text.RegularExpressions
-
+Imports Tai.Common
 
 
 Public Class Form1
@@ -269,7 +269,7 @@ retryStart:
 			' #############################################################
 			FrmSplash.UpdateText("Checking installed Personalities...")
 
-			For Each Dir As String In myDirectory.GetDirectories(Application.StartupPath & "\Scripts\")
+			For Each Dir As String In DirectoryExt.GetDirectories(Application.StartupPath & "\Scripts\")
 				Try
 					Dim DirSplit As String() = Dir.Split("\")
 					Dim PersonType As String = DirSplit(DirSplit.Length - 1)
@@ -4336,12 +4336,12 @@ DommeSlideshowFallback:
 
 						'StrokePace = ssh.randomizer.Next(NBMaxPace.Value, NBMinPace.Value + 1)
 						StrokePace = 50 * Math.Round(StrokePace / 50)
-							ssh.RLGLTauntTick = ssh.randomizer.Next(20, 31)
-							' VideoTauntTick = randomizer.Next(20, 31)
-							RLGLTauntTimer.Start()
+						ssh.RLGLTauntTick = ssh.randomizer.Next(20, 31)
+						' VideoTauntTick = randomizer.Next(20, 31)
+						RLGLTauntTimer.Start()
 
-						End If
 					End If
+				End If
 
 				If ssh.RLGLGame = True And ssh.RedLight = True Then
 					If (DomWMP.playState = WMPLib.WMPPlayState.wmppsPlaying) Then
@@ -5180,9 +5180,9 @@ chooseComboboxText:
 				ssh.SlideshowLoaded = False
 
 				If FrmSettings.CBSlideshowSubDir.Checked = True Then
-					ssh.SlideshowMain.ImageList = myDirectory.GetFilesImages(GetFolder, SearchOption.AllDirectories)
+					ssh.SlideshowMain.ImageList = DirectoryExt.GetFilesImages(GetFolder, SearchOption.AllDirectories)
 				Else
-					ssh.SlideshowMain.ImageList = myDirectory.GetFilesImages(GetFolder, SearchOption.TopDirectoryOnly)
+					ssh.SlideshowMain.ImageList = DirectoryExt.GetFilesImages(GetFolder, SearchOption.TopDirectoryOnly)
 				End If
 
 				ssh.SlideshowMain.Index = 0
@@ -5653,28 +5653,28 @@ Retry:
 		'									Genre Videos
 		'======================================================================================
 		If My.Settings.CBHardcore = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("HARDCORE")) Then _
-		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoHardcore))
+		__TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoHardcore))
 
 		If My.Settings.CBSoftcore = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("SOFTCORE")) Then _
-		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoSoftcore))
+		__TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoSoftcore))
 
 		If My.Settings.CBLesbian = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("LESBIAN")) Then _
-		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoLesbian))
+		__TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoLesbian))
 
 		If My.Settings.CBBlowjob = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("BLOWJOB")) Then _
-		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoBlowjob))
+		__TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoBlowjob))
 
 		If My.Settings.CBFemdom = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMDOM")) Then _
-		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemdom))
+		__TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoFemdom))
 
 		If My.Settings.CBFemsub = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMSUB")) Then _
-		__TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemsub))
+		__TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoFemsub))
 
 		If My.Settings.CBJOI = True And (ssh.VideoGenre.Contains("JOI")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOI))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoJOI))
 
 		If My.Settings.CBCH = True And (ssh.VideoGenre.Contains("CH")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCH))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoCH))
 
 		If ssh.NoSpecialVideo = True Then GoTo SkipSpecial
 
@@ -5689,38 +5689,38 @@ Retry:
 		'								Special - Videos
 		'======================================================================================
 		If My.Settings.CBJOI = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("JOI")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOI))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoJOI))
 
 		If My.Settings.CBCH = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("CH")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCH))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoCH))
 
 SkipSpecial:
 		'======================================================================================
 		'									General Videos
 		'======================================================================================
 		If My.Settings.CBGeneral = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("GENERAL")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoGeneral))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoGeneral))
 
 		'======================================================================================
 		'									Domme - Videos
 		'======================================================================================
 		If My.Settings.CBHardcoreD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("HARDCORD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoHardcoreD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoHardcoreD))
 
 		If My.Settings.CBSoftcoreD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("SOFTCORD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoSoftcoreD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoSoftcoreD))
 
 		If My.Settings.CBLesbianD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("LESBIAD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoLesbianD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoLesbianD))
 
 		If My.Settings.CBBlowjobD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("BLOWJOD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoBlowjobD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoBlowjobD))
 
 		If My.Settings.CBFemdomD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMDOD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemdomD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoFemdomD))
 
 		If My.Settings.CBFemsubD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("FEMSUD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoFemsubD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoFemsubD))
 
 		If ssh.NoSpecialVideo = True Then GoTo SkipSpecialD
 		If ssh.ScriptVideoTeaseFlag = True Then
@@ -5733,17 +5733,17 @@ SkipSpecial:
 		'								Domme - Special - Videos
 		'======================================================================================
 		If My.Settings.CBJOID = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("JOD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOID))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoJOID))
 
 		If My.Settings.CBCHD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("CD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCHD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoCHD))
 
 SkipSpecialD:
 		'======================================================================================
 		'								Domme - General Videos
 		'======================================================================================
 		If My.Settings.CBGeneralD = True And (ssh.VideoGenre = "ALL" Or ssh.VideoGenre.Contains("GENERAD")) Then _
-   __TotalFiles.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoGeneralD))
+   __TotalFiles.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoGeneralD))
 
 		If __TotalFiles.Count = 0 Then
 			Debug.Print("No files for genre " & ssh.VideoGenre)
@@ -5857,12 +5857,12 @@ GetAnotherRandomVideo:
 
 		If FrmSettings.LblVideoJOITotal.Text <> "0" And My.Settings.CBJOI = True Then
 
-			JOIVideos.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOI,
+			JOIVideos.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoJOI,
 						System.IO.SearchOption.AllDirectories))
 		End If
 
 		If FrmSettings.LblVideoJOITotalD.Text <> "0" And My.Settings.CBJOID = True Then
-			JOIVideos.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoJOI,
+			JOIVideos.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoJOI,
 						System.IO.SearchOption.AllDirectories))
 		End If
 
@@ -5893,10 +5893,10 @@ GetAnotherRandomVideo:
 		CHVideos.Clear()
 
 		If FrmSettings.LblVideoCHTotal.Text <> "0" And My.Settings.CBCH = True Then
-			CHVideos.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCH))
+			CHVideos.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoCH))
 		End If
 		If FrmSettings.LblVideoCHTotalD.Text <> "0" And My.Settings.CBCHD = True Then
-			CHVideos.AddRange(myDirectory.GetFilesVideo(My.Settings.VideoCHD))
+			CHVideos.AddRange(DirectoryExt.GetFilesVideo(My.Settings.VideoCHD))
 		End If
 
 		If CHVideos.Count < 1 Then
@@ -7457,7 +7457,7 @@ RinseLatherRepeat:
 			End While
 
 			StringClean = StringClean.Replace("@ShowLikedImage", "")
-        End If
+		End If
 
 		If StringClean.Contains("@ShowDislikedImage") Then
 			Dim i As Integer = 0
@@ -15711,11 +15711,13 @@ saveImage:
 		If Not Directory.Exists(baseDirectory) Then
 			Throw New DirectoryNotFoundException("The given slideshow base diretory \"" + baseDirectory + " \ " was not found.")
 		End If
-		Dim subDirs As List(Of String) = myDirectory.GetDirectories(myDirectory.GetDirectories(baseDirectory).ElementAt(ssh.randomizer.Next(0, myDirectory.GetDirectories(baseDirectory).Count()))).ToList()
+		Dim baseDirs As String() = DirectoryExt.GetDirectories(baseDirectory)
+		Dim selectedBaseDir = baseDirs.ElementAt(ssh.randomizer.Next(0, baseDirs.Length))
+		Dim subDirs As List(Of String) = DirectoryExt.GetDirectories(selectedBaseDir).ToList()
 		Dim rndFolder As String = Nothing
 		Do
 			rndFolder = subDirs(ssh.randomizer.Next(0, subDirs.Count))
-			If myDirectory.GetFilesImages(rndFolder, System.IO.SearchOption.TopDirectoryOnly).Count > 0 Then
+			If DirectoryExt.GetFilesImages(rndFolder, System.IO.SearchOption.TopDirectoryOnly).Count > 0 Then
 				Exit Do
 			End If
 			subDirs.Remove(rndFolder)
@@ -15774,7 +15776,7 @@ saveImage:
 				avatarImage = ssh.SlideshowMain.ImageList(ssh.randomizer.Next(0, ssh.SlideshowMain.ImageList.Count - 1))
 			End If
 			domAvatar.Image = Image.FromFile(avatarImage)
-			ssh.domAvatarImage = domAvatar.Image
+			ssh.domAvatarImage = avatarImage
 			Dim glitterImage2 As String = checkForImage("/glitter*.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact))
 			If String.IsNullOrEmpty(glitterImage2) Then
 				glitterImage2 = avatarImage
@@ -16016,7 +16018,7 @@ saveImage:
 			Dim avatarImage As String = checkForImage("/avatar.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact))
 			If avatarImage = "" Then avatarImage = ssh.SlideshowMain.ImageList(ssh.randomizer.Next(0, ssh.SlideshowMain.ImageList().Count - 1))
 			domAvatar.Image = Image.FromFile(avatarImage)
-			ssh.domAvatarImage = domAvatar.Image
+			ssh.domAvatarImage = avatarImage
 		End If
 		ssh.shortName = ssh.SlideshowMain.ShortName
 		Me.domName.Text = ssh.tempDomName
@@ -16394,7 +16396,7 @@ restartInstantly:
 			ssh.Load(filename, True)
 			Me.domName.Text = ssh.tempDomName
 			FrmSettings.LBLCurrentDomme.Text = ssh.tempDomName
-			If Not IsNothing(ssh.domAvatarImage) Then domAvatar.Image = ssh.domAvatarImage
+			If Not IsNothing(ssh.domAvatarImage) Then domAvatar.Image = Image.FromFile(ssh.domAvatarImage)
 			If ssh.SaidHello And My.Settings.LockOrgasmChances Then _
 			 FrmSettings.LockOrgasmChances(True)
 			ScriptTimer.Start()
@@ -20091,7 +20093,7 @@ playLoop:
 				End If
 
 				If tmpFilter = "*" Or tmpFilter = "*.*" Then
-					ImageList = myDirectory.GetFilesImages(tmpDir)
+					ImageList = DirectoryExt.GetFilesImages(tmpDir)
 				Else
 					ImageList = Directory.GetFiles(tmpDir, tmpFilter, SearchOption.TopDirectoryOnly).ToList
 				End If

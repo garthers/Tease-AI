@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Threading
 Imports System.Windows.Forms
 Imports System.Net
+Imports Tai.Common
 
 Partial Class Form1
 
@@ -238,9 +239,9 @@ Partial Class Form1
 					' Load Local ImageList
 					If Type = ImageSourceType.Local AndAlso LocalDirectory <> "" AndAlso LocalDirectory IsNot Nothing Then
 						If LocalSubDirectories = False Then
-							rtnList.AddRange(myDirectory.GetFilesImages(LocalDirectory, SearchOption.TopDirectoryOnly))
+							rtnList.AddRange(DirectoryExt.GetFilesImages(LocalDirectory, SearchOption.TopDirectoryOnly))
 						Else
-							rtnList.AddRange(myDirectory.GetFilesImages(LocalDirectory, SearchOption.AllDirectories))
+							rtnList.AddRange(DirectoryExt.GetFilesImages(LocalDirectory, SearchOption.AllDirectories))
 						End If
 					End If
 
