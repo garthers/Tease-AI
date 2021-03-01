@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Tease AI", "Tease AI\Tease AI.vbproj", "{0471446B-925E-48F7-A6C4-8FDDD7AE2AA9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tai.Common", "Tai.Common\Tai.Common.csproj", "{3132B8DC-B3A6-46A2-8A72-42FAED570790}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,19 @@ Global
 		{0471446B-925E-48F7-A6C4-8FDDD7AE2AA9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0471446B-925E-48F7-A6C4-8FDDD7AE2AA9}.Release|x86.ActiveCfg = Release|x86
 		{0471446B-925E-48F7-A6C4-8FDDD7AE2AA9}.Release|x86.Build.0 = Release|x86
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Debug|x86.Build.0 = Debug|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Release|x86.ActiveCfg = Release|Any CPU
+		{3132B8DC-B3A6-46A2-8A72-42FAED570790}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {41358197-4EFC-453D-9BE0-24AD957C385F}
 	EndGlobalSection
 EndGlobal
