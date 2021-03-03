@@ -5930,7 +5930,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("417")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("357")>  _
         Public Property SplitterPosition() As Integer
             Get
                 Return CType(Me("SplitterPosition"),Integer)

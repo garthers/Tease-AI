@@ -44,15 +44,15 @@ namespace Tai.Common
             get
             {
                 if (Contact == ContactType.Contact1)
-                    return My.Settings.Glitter1;
+                    return _settings.Glitter1;
                 else if (Contact == ContactType.Contact2)
-                    return My.Settings.Glitter2;
+                    return _settings.Glitter2;
                 else if (Contact == ContactType.Contact3)
-                    return My.Settings.Glitter3;
+                    return _settings.Glitter3;
                 else if (Contact == ContactType.Random)
                     return ImageFolder.Substring(ImageFolder.LastIndexOf(@"\") + 1).Trim();
                 else
-                    return My.Settings.DomName;
+                    return _settings.DomName;
             }
         }
 
@@ -61,15 +61,15 @@ namespace Tai.Common
             get
             {
                 if (Contact == ContactType.Contact1)
-                    return My.Settings.G1Honorific;
+                    return _settings.G1Honorific;
                 else if (Contact == ContactType.Contact2)
-                    return My.Settings.G2Honorific;
+                    return _settings.G2Honorific;
                 else if (Contact == ContactType.Contact3)
-                    return My.Settings.G3Honorific;
+                    return _settings.G3Honorific;
                 else if (Contact == ContactType.Random)
-                    return My.Settings.RandomHonorific;
+                    return _settings.RandomHonorific;
                 else
-                    return My.Settings.SubHonorific;
+                    return _settings.SubHonorific;
             }
         }
 
@@ -78,7 +78,7 @@ namespace Tai.Common
             get
             {
                 // If Contact = ContactType.Domme Then
-                // Return My.Settings.GlitterSN
+                // Return Settings.GlitterSN
                 // Else
                 return TypeName;
             }
@@ -88,13 +88,13 @@ namespace Tai.Common
             get
             {
                 if (Contact == ContactType.Contact1)
-                    return Common.Color2Html(My.Settings.GlitterNC1Color);
+                    return Common.Color2Html(_settings.GlitterNC1Color);
                 else if (Contact == ContactType.Contact2)
-                    return Common.Color2Html(My.Settings.GlitterNC2Color);
+                    return Common.Color2Html(_settings.GlitterNC2Color);
                 else if (Contact == ContactType.Contact3)
-                    return Common.Color2Html(My.Settings.GlitterNC3Color);
+                    return Common.Color2Html(_settings.GlitterNC3Color);
                 else
-                    return My.Settings.DomColor;
+                    return _settings.DomColor;
             }
         }
 
@@ -102,7 +102,7 @@ namespace Tai.Common
         {
             get
             {
-                return My.Settings.DomFont;
+                return _settings.DomFont;
             }
         }
 
@@ -110,7 +110,7 @@ namespace Tai.Common
         {
             get
             {
-                return My.Settings.DomFontSize;
+                return _settings.DomFontSize;
             }
         }
 
@@ -127,7 +127,7 @@ namespace Tai.Common
         {
             get
             {
-                return My.Settings.VVolume;
+                return _settings.VVolume;
             }
         }
 
@@ -135,7 +135,7 @@ namespace Tai.Common
         {
             get
             {
-                return My.Settings.VRate;
+                return _settings.VRate;
             }
         }
 
@@ -143,14 +143,21 @@ namespace Tai.Common
         [OptionalField]
         private Dictionary<string, ImageTagCacheItem> ImageTagCache = new Dictionary<string, ImageTagCacheItem>(StringComparer.OrdinalIgnoreCase);
 
-        public ContactData()
+        private readonly ISettings _settings;
+        private readonly Random _random;
+
+        public ContactData(ISettings settings, Random random)
         {
+            _settings = settings;
+            _random = random;
         }
 
-        public ContactData(ContactType type)
+        public ContactData(ContactType type, ISettings settings, Random random)
         {
             Contact = type;
-            Check_ImageDir(type);
+            _settings = settings;
+            _random = random;
+            //Check_ImageDir();
         }
 
         /// <summary>
@@ -164,10 +171,12 @@ namespace Tai.Common
                 ImageTagCache = new Dictionary<string, ImageTagCacheItem>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public bool Check_ImageDir(ContactType tp)
+        public bool Check_ImageDir()
         {
-            string def = getDefaultFolder(tp);
-            string val = getCurrentBaseFolder(tp);
+            /*
+            var tp = Contact;
+            string def = getDefaultFolder();
+            string val = getCurrentBaseFolder();
             string text = "";
 
             if (tp == ContactType.Domme)
@@ -182,12 +191,13 @@ namespace Tai.Common
                 text = "Random";
 
             val = FolderCheck(text, val, def);
+            */
+            //if (Contact == ContactType.Random)
+            //    SetBaseFolder(val);
 
-            SetBaseFolder(tp, val);
-
-            if (val == def)
-                return false;
-            else
+            //if (val == def)
+            //    return false;
+            //else
                 return true;
         }
 
@@ -213,7 +223,7 @@ namespace Tai.Common
 
                 foreach (var folder in Directory.EnumerateDirectories(rtnPath))
                 {
-                    if (My.Settings.CBSlideshowSubDir)
+                    if (_settings.CBSlideshowSubDir)
                         imgCount += DirectoryExt.GetFilesImages(folder, SearchOption.AllDirectories).Count;
                     else
                         imgCount += DirectoryExt.GetFilesImages(folder, SearchOption.TopDirectoryOnly).Count;
@@ -233,13 +243,13 @@ namespace Tai.Common
 
         }
 
-        public List<string> GetRandom(ContactType tp, bool newFolder)
+        public List<string> GetRandom(bool newFolder)
         {
             // no need to check again since you already checked when creating the contact
-            if (Check_ImageDir(tp))
-                return LoadRandom(getCurrentBaseFolder(tp), newFolder);
-            else
-                return new List<string>();
+            //if (Check_ImageDir())
+                return LoadRandom(getCurrentBaseFolder(), newFolder);
+            //else
+            //    return new List<string>();
         }
 
         public List<string> LoadRandom(string baseDirectory, bool newFolder)
@@ -249,24 +259,25 @@ namespace Tai.Common
             string currPath;
             if (Contact == ContactType.Random & !newFolder)
             {
-                currPath = DirectoryExt.GetDirectories(baseDirectory).ElementAt(Form1.ssh.randomizer.Next(0, DirectoryExt.GetDirectories(baseDirectory).Length));
+                currPath = DirectoryExt.GetDirectories(baseDirectory).ElementAt(_random.Next(0, DirectoryExt.GetDirectories(baseDirectory).Length));
                 tempBaseFolder = currPath;
             }
             else
                 currPath = baseDirectory;
-            while (currPath.Contains("#Contact") && Contact == ContactType.Random || currPath.Contains(FrmSettings.TbxDomImageDir.Text) && Contact == ContactType.Random)
+            //  || currPath.Contains(FrmSettings.TbxDomImageDir.Text) && Contact == ContactType.Random) TODO
+            while (currPath.Contains("#Contact") && Contact == ContactType.Random)
             {
                 if (Contact == ContactType.Random & !newFolder)
                 {
-                    currPath = DirectoryExt.GetDirectories(baseDirectory).ElementAt(Form1.ssh.randomizer.Next(0, DirectoryExt.GetDirectories(baseDirectory).Length));
+                    currPath = DirectoryExt.GetDirectories(baseDirectory).ElementAt(_random.Next(0, DirectoryExt.GetDirectories(baseDirectory).Length));
                     tempBaseFolder = currPath;
                 }
                 else
                     currPath = baseDirectory;
             }
             List<string> subDirs = DirectoryExt.GetDirectories(currPath).ToList();
-            if (subDirs.Contains(My.Settings.DomImageDirRand))
-                subDirs.Remove(My.Settings.DomImageDirRand);
+            if (subDirs.Contains(_settings.DomImageDirRand))
+                subDirs.Remove(_settings.DomImageDirRand);
             List<string> dirListToExclude = new List<string>();
             foreach (string tempDir in subDirs)
             {
@@ -297,7 +308,7 @@ namespace Tai.Common
                 throw new DirectoryNotFoundException("There are no subdirectories containing images in \"" + currPath + "\".");
 
             // Get a random folder in base directory.
-            string rndFolder = subDirs[Form1.ssh.randomizer.Next(0, subDirs.Count)];
+            string rndFolder = subDirs[_random.Next(0, subDirs.Count)];
 
             if (RecentFolders.Contains(rndFolder))
             {
@@ -309,7 +320,7 @@ namespace Tai.Common
             // Read all imagefiles in random folder.
             List<string> imageFiles = new List<string>();
 
-            if (My.Settings.CBSlideshowSubDir)
+            if (_settings.CBSlideshowSubDir)
                 imageFiles = DirectoryExt.GetFilesImages(rndFolder, SearchOption.AllDirectories);
             else
                 imageFiles = DirectoryExt.GetFilesImages(rndFolder, SearchOption.TopDirectoryOnly);
@@ -329,68 +340,65 @@ namespace Tai.Common
             }
         }
 
-
-        public string getMySettingsMember(ContactType tp)
+        public string getDefaultFolder()
         {
-            switch (tp)
+            switch (Contact)
             {
                 case ContactType.Domme:
-                    {
-                        return "DomImageDir";
-                    }
+                    return _settings.DomImageDir;
 
                 case ContactType.Contact1:
-                    {
-                        return "Contact1ImageDir";
-                    }
+                    return _settings.Contact1ImageDir;
 
                 case ContactType.Contact2:
-                    {
-                        return "Contact2ImageDir";
-                    }
+                    return _settings.Contact2ImageDir;
 
                 case ContactType.Contact3:
-                    {
-                        return "Contact3ImageDir";
-                    }
+                    return _settings.Contact3ImageDir;
 
                 case ContactType.Random:
-                    {
-                        return "RandomImageDir";
-                    }
-
-                default:
-                    {
-                        throw new NotImplementedException();
-                        break;
-                    }
+                    return _settings.RandomImageDir;
             }
+            throw new Exception("Unknown contact type");
         }
 
-        public string getDefaultFolder(ContactType tp)
+        public string getCurrentBaseFolder()
         {
-            return (string) Settings.Default[getMySettingsMember(tp)];
-        }
-
-        public string getCurrentBaseFolder(ContactType tp)
-        {
-            if (tempBaseFolder != "")
+            if (!string.IsNullOrEmpty(tempBaseFolder))
                 return tempBaseFolder;
             else
-                return (string) Settings.Default[getMySettingsMember(tp)];
+                return getDefaultFolder();
         }
 
-    public void SetBaseFolder(ContactType tp, string path)
-    {
-        //My.Settings.D(getMySettingsMember(tp)) = path;
-        Settings.Default[getMySettingsMember(tp)] = path;
-    }
+        public void SetBaseFolder(string path)
+        {
+            //Settings.Default[getMySettingsMember(tp)] = path;
+            switch (Contact)
+            {
+                case ContactType.Domme:
+                    _settings.DomImageDir = path; break;
+
+                case ContactType.Contact1:
+                    _settings.Contact1ImageDir = path; break;
+
+                case ContactType.Contact2:
+                    _settings.Contact2ImageDir = path; break;
+
+                case ContactType.Contact3:
+                    _settings.Contact3ImageDir = path; break;
+
+                case ContactType.Random:
+                    _settings.RandomImageDir = path; break;
+                default:
+                    throw new Exception("Unknown contact type");
+            }
+        }
 
 
 
         public void LoadNew(bool newFolder)
         {
-            this.ImageList = GetRandom(this.Contact, newFolder);
+            this.ImageList = GetRandom(newFolder);
             this.Index = 0;
             ImageTagCache.Clear();
             LastTaggedImage = "";
@@ -440,9 +448,9 @@ namespace Tai.Common
                 Index = 0;
                 return string.Empty;
             }
-            else if (Index >= ImageList.Count - 1 && My.Settings.CBNewSlideshow)
+            else if (Index >= ImageList.Count - 1 && _settings.CBNewSlideshow)
                 // End of Slideshow load new one
-                LoadNew(My.Settings.CBRandomDomme);
+                LoadNew(_settings.CBRandomDomme);
             else if (Index >= ImageList.Count - 1)
                 // End of Slideshow return last image
                 Index = ImageList.Count - 1;
@@ -457,19 +465,19 @@ namespace Tai.Common
         {
             CheckInit();
 
-            if (My.Settings.CBSlideshowRandom)
+            if (_settings.CBSlideshowRandom)
                 // get Random Image
-                Index = Form1.ssh.randomizer.Next(0, ImageList.Count);
-            else if (My.Settings.NextImageChance < Form1.ssh.randomizer.Next(0, 101))
+                Index = _random.Next(0, ImageList.Count);
+            else if (_settings.NextImageChance < _random.Next(0, 101))
             {
                 // Randomly backwards
                 Index -= 1;
                 if (Index < 0)
                     Index = 0;
             }
-            else if (Index >= ImageList.Count - 1 && My.Settings.CBNewSlideshow)
+            else if (Index >= ImageList.Count - 1 && _settings.CBNewSlideshow)
                 // End of Slideshow start new
-                LoadNew(My.Settings.CBRandomDomme);
+                LoadNew(_settings.CBRandomDomme);
             else if (Index >= ImageList.Count - 1)
                 // End of Slideshow return last
                 Index = ImageList.Count - 1;
@@ -577,7 +585,7 @@ namespace Tai.Common
                 // End If
                 // Next
                 if (ImagePaths.TagImageList.Count != 0)
-                    rtnPath = ImagePaths.TagImageList.ElementAt(Form1.ssh.randomizer.Next(0, ImagePaths.TagImageList.Count));
+                    rtnPath = ImagePaths.TagImageList.ElementAt(_random.Next(0, ImagePaths.TagImageList.Count));
                 else
                     rtnPath = ImagePaths.LastPicked;
                 // ===================================================================

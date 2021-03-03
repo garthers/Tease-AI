@@ -60,6 +60,7 @@ namespace Tai.Common
         [Description("Contains the Tease-AI Version of this session.")]
         public string Version { get => Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
 
+        public ISettings _settings;
 
         public string DomPersonality { get; set; }
 
@@ -673,6 +674,7 @@ namespace Tai.Common
         public ContactData SlideshowMasterDomme { get; set; }
         public int StrokePaceMem { get; set; }
 
+        public Random Rng => randomizer;
 
         public bool serialized_WMP_Visible;
         public string serialized_WMP_URL;
@@ -776,8 +778,9 @@ namespace Tai.Common
         /// <summary>
         /// 	''' Creates a new unactivaed instance.
         /// 	''' </summary>
-        public SessionState()
+        public SessionState(ISettings settings)
         {
+            _settings = settings;
             // not actually a component
             InitializeComponent();
         }
@@ -786,8 +789,9 @@ namespace Tai.Common
         ///     ''' </summary>
         ///     ''' <param name="ActivationForm">The Form on which to apply the session.</param>
 
-        public SessionState(object ActivationForm)
+        public SessionState(object ActivationForm, ISettings settings)
         {
+            _settings = settings;
             InitializeComponent();
             Activate(ActivationForm);
         }
@@ -799,23 +803,23 @@ namespace Tai.Common
 
             randomizer = new Random();
 
-            DomPersonality = My.Settings.DomPersonality;
+            DomPersonality = _settings.DomPersonality;
 
-            StrokeTimeTotal = My.Settings.StrokeTimeTotal;
+            StrokeTimeTotal = _settings.StrokeTimeTotal;
 
-            HoldEdgeTimeTotal = My.Settings.HoldEdgeTimeTotal;
+            HoldEdgeTimeTotal = _settings.HoldEdgeTimeTotal;
 
-            GoldTokens = My.Settings.GoldTokens > 0 ? My.Settings.GoldTokens : 0;
-            SilverTokens = My.Settings.SilverTokens > 0 ? My.Settings.SilverTokens : 0;
-            BronzeTokens = My.Settings.BronzeTokens > 0 ? My.Settings.BronzeTokens : 0;
+            GoldTokens = _settings.GoldTokens > 0 ? _settings.GoldTokens : 0;
+            SilverTokens = _settings.SilverTokens > 0 ? _settings.SilverTokens : 0;
+            BronzeTokens = _settings.BronzeTokens > 0 ? _settings.BronzeTokens : 0;
 
-            AvgEdgeStroking = My.Settings.AvgEdgeStroking;
-            AvgEdgeNoTouch = My.Settings.AvgEdgeNoTouch;
-            AvgEdgeCount = My.Settings.AvgEdgeCount;
-            AvgEdgeCountRest = My.Settings.AvgEdgeCountRest;
+            AvgEdgeStroking = _settings.AvgEdgeStroking;
+            AvgEdgeNoTouch = _settings.AvgEdgeNoTouch;
+            AvgEdgeCount = _settings.AvgEdgeCount;
+            AvgEdgeCountRest = _settings.AvgEdgeCountRest;
 
-            giveUpReturn = My.Settings.GiveUpReturn;
-            DommeMood = randomizer.Next(My.Settings.DomMoodMin, My.Settings.DomMoodMax + 1);
+            giveUpReturn = _settings.GiveUpReturn;
+            DommeMood = randomizer.Next(_settings.DomMoodMin, _settings.DomMoodMax + 1);
 
             // SlideshowMain = New ContactData(ContactType.Domme)
             // SlideshowContact1 = New ContactData(ContactType.Contact1)
@@ -825,8 +829,8 @@ namespace Tai.Common
             // currentlyPresentContacts = New List(Of String)
             // currentlyPresentContacts.Add(SlideshowMain.TypeName)
 
-            CaloriesConsumed = My.Settings.CaloriesConsumed;
-            checkAnswers = new subAnswers();
+            CaloriesConsumed = _settings.CaloriesConsumed;
+            checkAnswers = new subAnswers(_settings);
         }
 
 
@@ -1058,7 +1062,7 @@ namespace Tai.Common
                 // Set Domme Personality
                 // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
                 if (DomPersonality == string.Empty)
-                    DomPersonality = My.Settings.DomPersonality;
+                    DomPersonality = _settings.DomPersonality;
 
                 if (withBlock.dompersonalitycombobox.Items.Contains(DomPersonality) == false)
                     throw new Exception("The personality \"" + DomPersonality + "\" was not found.");
@@ -1325,7 +1329,7 @@ namespace Tai.Common
                 return System.Convert.ToBoolean(ActivationForm.UIThread(Reset));
             // Called from Controls UI-Thread -> Execute Code.
 
-            FrmSettings.TBHonorific.Text = My.Settings.SubHonorific;
+            FrmSettings.TBHonorific.Text = _settings.SubHonorific;
 
             Dispose();
 

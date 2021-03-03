@@ -36,7 +36,7 @@ Namespace My
             ' Load or import a specific user.config-file.
             MySettings.StartupCheck()
 
-			Session = New SessionState
+			Session = New SessionState(New MySettingsWrapper)
 		End Sub
 
 		''' =========================================================================================================

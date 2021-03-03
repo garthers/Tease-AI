@@ -23,12 +23,12 @@ namespace Tai.Common
         private List<string> checkList = new List<string>();
         private List<string> answerList = new List<string>();
 
-        public subAnswers()
+        public subAnswers(ISettings settings)
         {
-            checkList.Add(Settings.Default.SubGreeting);
-            checkList.Add(Settings.Default.SubYes);
-            checkList.Add(Settings.Default.SubNo);
-            checkList.Add(Settings.Default.SubSorry);
+            checkList.Add(settings.SubGreeting);
+            checkList.Add(settings.SubYes);
+            checkList.Add(settings.SubNo);
+            checkList.Add(settings.SubSorry);
             checkList.Add("thank,thanks");
             checkList.Add("please");
         }

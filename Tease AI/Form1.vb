@@ -15769,6 +15769,15 @@ saveImage:
 			My.Settings.CBRandomDomme = False
 		End Try
 	End Sub
+	Public Function CreateContactData(type As ContactType) As ContactData
+		If _settingsWrapper Is Nothing Then
+			_settingsWrapper = New MySettingsWrapper
+		End If
+		Return New ContactData(type, _settingsWrapper, ssh.randomizer)
+	End Function
+
+	Private _settingsWrapper As ISettings
+
 	Public Sub InitDommeImageFolder()
 		If My.Settings.CBAutoDomPP OrElse FrmSettings.CBRandomDomme.Checked Then
 			Dim avatarImage As String = checkForImage("/avatar*.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact))
@@ -15839,7 +15848,7 @@ saveImage:
 			My.Settings.Glitter1 = Contact1dir.Name
 			My.Settings.Glitter2 = Contact2dir.Name
 			My.Settings.Glitter3 = Contact3dir.Name
-			ssh.SlideshowContact1 = New ContactData(ContactType.Contact1)
+			ssh.SlideshowContact1 = CreateContactData(ContactType.Contact1)
 			ssh.SlideshowContact1.LoadNew(ssh.newSlideshow)
 			Dim glitterImage As String = checkForImage("/glitter*.*", Contact1path)
 			If glitterImage = "" Then
@@ -15849,7 +15858,7 @@ saveImage:
 				My.Settings.GlitterAV1 = glitterImage
 				FrmSettings.GlitterAV1.Image = Image.FromFile(glitterImage)
 			End If
-			ssh.SlideshowContact2 = New ContactData(ContactType.Contact2)
+			ssh.SlideshowContact2 = CreateContactData(ContactType.Contact2)
 			ssh.SlideshowContact2.LoadNew(ssh.newSlideshow)
 			glitterImage = checkForImage("/glitter*.*", Contact2path)
 			If glitterImage = "" Then
@@ -15860,7 +15869,7 @@ saveImage:
 				FrmSettings.GlitterAV2.Image = Image.FromFile(glitterImage)
 			End If
 
-			ssh.SlideshowContact3 = New ContactData(ContactType.Contact3)
+			ssh.SlideshowContact3 = CreateContactData(ContactType.Contact3)
 			ssh.SlideshowContact3.LoadNew(ssh.newSlideshow)
 			glitterImage = checkForImage("/glitter*.*", Contact3path)
 			If glitterImage = "" Then
@@ -15965,38 +15974,38 @@ saveImage:
 						ssh.SlideshowMain = ssh.SlideshowMasterDomme
 					Else
 						newSet = True
-						ssh.SlideshowMain = New ContactData(ContactType.Domme)
+						ssh.SlideshowMain = CreateContactData(ContactType.Domme)
 					End If
 
 					ssh.tempHonorific = PoundClean(My.Settings.SubHonorific)
 				Else
-					ssh.SlideshowMain = New ContactData(ContactType.Random)
+					ssh.SlideshowMain = CreateContactData(ContactType.Random)
 					ssh.tempHonorific = PoundClean(My.Settings.RandomHonorific)
 				End If
 			ElseIf ssh.glitterDommeNumber = 1 Then
 				If Not ssh.contact1Present Then
-					ssh.SlideshowMain = New ContactData(ContactType.Contact1)
+					ssh.SlideshowMain = CreateContactData(ContactType.Contact1)
 				Else
 					ssh.SlideshowMain = ssh.SlideshowContact1
 				End If
 				ssh.tempHonorific = My.Settings.G1Honorific
 			ElseIf ssh.glitterDommeNumber = 2 Then
 				If Not ssh.contact2Present Then
-					ssh.SlideshowMain = New ContactData(ContactType.Contact2)
+					ssh.SlideshowMain = CreateContactData(ContactType.Contact2)
 				Else
 					ssh.SlideshowMain = ssh.SlideshowContact2
 				End If
 				ssh.tempHonorific = My.Settings.G2Honorific
 			ElseIf ssh.glitterDommeNumber = 3 Then
 				If Not ssh.contact3Present Then
-					ssh.SlideshowMain = New ContactData(ContactType.Contact3)
+					ssh.SlideshowMain = CreateContactData(ContactType.Contact3)
 				Else
 					ssh.SlideshowMain = ssh.SlideshowContact3
 				End If
 				ssh.tempHonorific = My.Settings.G3Honorific
 			ElseIf ssh.glitterDommeNumber = 4 Then
 				If newSet Then
-					ssh.SlideshowMain = New ContactData(ContactType.Random)
+					ssh.SlideshowMain = CreateContactData(ContactType.Random)
 					ssh.tempHonorific = PoundClean(My.Settings.RandomHonorific)
 					ssh.SlideshowContactRandom = ssh.SlideshowMain
 				Else
@@ -19790,16 +19799,16 @@ playLoop:
 
 	Public Sub setStartName()
 		Try
-			ssh.SlideshowMain = New ContactData(ContactType.Domme)
+			ssh.SlideshowMain = CreateContactData(ContactType.Domme)
 			ssh.SlideshowMain.LoadNew(False)
 			ssh.SlideshowMasterDomme = ssh.SlideshowMain
-			ssh.SlideshowContact1 = New ContactData(ContactType.Contact1)
+			ssh.SlideshowContact1 = CreateContactData(ContactType.Contact1)
 			ssh.SlideshowContact1.LoadNew(False)
-			ssh.SlideshowContact2 = New ContactData(ContactType.Contact2)
+			ssh.SlideshowContact2 = CreateContactData(ContactType.Contact2)
 			ssh.SlideshowContact2.LoadNew(False)
-			ssh.SlideshowContact3 = New ContactData(ContactType.Contact3)
+			ssh.SlideshowContact3 = CreateContactData(ContactType.Contact3)
 			ssh.SlideshowContact3.LoadNew(False)
-			ssh.SlideshowContactRandom = New ContactData(ContactType.Random)
+			ssh.SlideshowContactRandom = CreateContactData(ContactType.Random)
 			ssh.SlideshowContactRandom.LoadNew(False)
 		Catch ex As Exception
 		End Try

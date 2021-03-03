@@ -60,6 +60,7 @@ Public Class FrmSettings
 	End Sub
 
 	Public Sub FrmSettingStartUp()
+		_settingsWrapper = New MySettingsWrapper()
 
 		FrmSettingsLoading = True
 
@@ -2777,39 +2778,40 @@ SkipDeserializing:
 		End If
 	End Sub
 
+	Private _settingsWrapper As ISettings
 
 	Private Sub BTNDomImageDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BTNDomImageDir.Click
 		If (FolderBrowserDialog1.ShowDialog() = DialogResult.OK) Then
 			My.Settings.DomImageDir = FolderBrowserDialog1.SelectedPath
-			My.Application.Session.SlideshowMain = New ContactData(ContactType.Domme)
+			My.Application.Session.SlideshowMain = New ContactData(ContactType.Domme, _settingsWrapper, Ssh.randomizer)
 		End If
 	End Sub
 
 	Private Sub BtnContact1ImageDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnContact1ImageDir.Click
 		If (FolderBrowserDialog1.ShowDialog() = DialogResult.OK) Then
 			My.Settings.Contact1ImageDir = FolderBrowserDialog1.SelectedPath
-			My.Application.Session.SlideshowContact1 = New ContactData(ContactType.Contact1)
+			My.Application.Session.SlideshowContact1 = New ContactData(ContactType.Contact1, _settingsWrapper, Ssh.randomizer)
 		End If
 	End Sub
 
 	Private Sub BtnContact2ImageDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnContact2ImageDir.Click
 		If (FolderBrowserDialog1.ShowDialog() = DialogResult.OK) Then
 			My.Settings.Contact2ImageDir = FolderBrowserDialog1.SelectedPath
-			My.Application.Session.SlideshowContact2 = New ContactData(ContactType.Contact2)
+			My.Application.Session.SlideshowContact2 = New ContactData(ContactType.Contact2, _settingsWrapper, Ssh.randomizer)
 		End If
 	End Sub
 
 	Private Sub BtnContact3ImageDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnContact3ImageDir.Click
 		If (FolderBrowserDialog1.ShowDialog() = DialogResult.OK) Then
 			My.Settings.Contact3ImageDir = FolderBrowserDialog1.SelectedPath
-			My.Application.Session.SlideshowContact3 = New ContactData(ContactType.Contact3)
+			My.Application.Session.SlideshowContact3 = New ContactData(ContactType.Contact3, _settingsWrapper, Ssh.randomizer)
 		End If
 	End Sub
 
 	Private Sub BtnRandomImageDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnRandomImageDir.Click
 		If (FolderBrowserDialog1.ShowDialog() = DialogResult.OK) Then
 			My.Settings.RandomImageDir = FolderBrowserDialog1.SelectedPath
-			My.Application.Session.SlideshowContactRandom = New ContactData(ContactType.Random)
+			My.Application.Session.SlideshowContactRandom = New ContactData(ContactType.Random, _settingsWrapper, Ssh.randomizer)
 			TbxRandomImageDir.Text = My.Settings.RandomImageDir
 			Form1.CheckRandomOpportunities()
 		End If
@@ -2940,22 +2942,22 @@ SkipDeserializing:
 
 	Private Sub BtnContact1ImageDirClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnContact1ImageDirClear.Click
 		My.Settings.ResetField(TbxContact1ImageDir, "Text")
-		My.Application.Session.SlideshowContact1 = New ContactData()
+		My.Application.Session.SlideshowContact1 = New ContactData(_settingsWrapper, Ssh.randomizer)
 	End Sub
 
 	Private Sub BtnContact2ImageDirClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnContact2ImageDirClear.Click
 		My.Settings.ResetField(TbxContact2ImageDir, "Text")
-		My.Application.Session.SlideshowContact2 = New ContactData()
+		My.Application.Session.SlideshowContact2 = New ContactData(_settingsWrapper, Ssh.randomizer)
 	End Sub
 
 	Private Sub BtnContact3ImageDirClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnContact3ImageDirClear.Click
 		My.Settings.ResetField(TbxContact3ImageDir, "Text")
-		My.Application.Session.SlideshowContact3 = New ContactData()
+		My.Application.Session.SlideshowContact3 = New ContactData(_settingsWrapper, Ssh.randomizer)
 	End Sub
 
 	Private Sub BtnRandomImageDirClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnRandomImageDirClear.Click
 		My.Settings.ResetField(TbxRandomImageDir, "Text")
-		My.Application.Session.SlideshowContactRandom = New ContactData()
+		My.Application.Session.SlideshowContactRandom = New ContactData(_settingsWrapper, Ssh.randomizer)
 	End Sub
 	Private Sub Button16_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button16.Click
 
@@ -6044,22 +6046,22 @@ checkFolder:
 
 	Private Sub TBGreeting_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBGreeting.LostFocus
 		My.Settings.SubGreeting = TBGreeting.Text
-		Ssh.checkAnswers = New subAnswers()
+		Ssh.checkAnswers = New subAnswers(_settingsWrapper)
 	End Sub
 
 	Private Sub TBYes_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBYes.LostFocus
 		My.Settings.SubYes = TBYes.Text
-		Ssh.checkAnswers = New subAnswers()
+		Ssh.checkAnswers = New subAnswers(_settingsWrapper)
 	End Sub
 
 	Private Sub TBNo_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBNo.LostFocus
 		My.Settings.SubNo = TBNo.Text
-		Ssh.checkAnswers = New subAnswers()
+		Ssh.checkAnswers = New subAnswers(_settingsWrapper)
 	End Sub
 
 	Private Sub TBSorry_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBSorry.LostFocus
 		My.Settings.SubSorry = TBSorry.Text
-		Ssh.checkAnswers = New subAnswers()
+		Ssh.checkAnswers = New subAnswers(_settingsWrapper)
 	End Sub
 
 	Private Sub TBHonorific_LostFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TBHonorific.LostFocus
