@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Collections;
+using Tai.Common.Images;
 
 namespace Tai.Common
 {

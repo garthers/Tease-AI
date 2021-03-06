@@ -166,7 +166,7 @@ namespace Tai.Common
         int SelfAgeMin { get; set; }
         int SelfAgeMax { get; set; }
         int SubAgeMin { get; set; }
-        string SubAgeMax { get; set; }
+        int SubAgeMax { get; set; }
         bool CBLockWindow { get; set; }
         string SubGreeting { get; set; }
         string SubYes { get; set; }
@@ -426,9 +426,9 @@ namespace Tai.Common
         string LS9 { get; set; }
         string LS10 { get; set; }
         int LongHoldMin { get; set; }
-        string LongHoldMax { get; set; }
-        string ExtremeHoldMin { get; set; }
-        string ExtremeHoldMax { get; set; }
+        int LongHoldMax { get; set; }
+        int ExtremeHoldMin { get; set; }
+        int ExtremeHoldMax { get; set; }
         bool CBWebtease { get; set; }
         int SplitterDistance { get; set; }
         bool SideChat { get; set; }
@@ -464,16 +464,16 @@ namespace Tai.Common
         bool UrlFileBoobsEnabled { get; set; }
         bool UrlFileButtEnabled { get; set; }
         bool CBURLPreview { get; set; }
-        decimal TaskStrokesMin { get; set; }
-        decimal TaskStrokesMax { get; set; }
-        decimal TaskStrokingTimeMin { get; set; }
-        decimal TaskStrokingTimeMax { get; set; }
-        decimal TaskEdgesMin { get; set; }
-        decimal TaskEdgesMax { get; set; }
-        decimal TaskEdgeHoldTimeMin { get; set; }
-        decimal TaskEdgeHoldTimeMax { get; set; }
-        decimal TaskCBTTimeMin { get; set; }
-        decimal TaskCBTTimeMax { get; set; }
+        int TaskStrokesMin { get; set; }
+        int TaskStrokesMax { get; set; }
+        int TaskStrokingTimeMin { get; set; }
+        int TaskStrokingTimeMax { get; set; }
+        int TaskEdgesMin { get; set; }
+        int TaskEdgesMax { get; set; }
+        int TaskEdgeHoldTimeMin { get; set; }
+        int TaskEdgeHoldTimeMax { get; set; }
+        int TaskCBTTimeMin { get; set; }
+        int TaskCBTTimeMax { get; set; }
         string TasksMin { get; set; }
         string TasksMax { get; set; }
         bool WritingProgress { get; set; }

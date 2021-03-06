@@ -1273,7 +1273,7 @@ Public Class MySettingsWrapper
             _settings.SubAgeMin = Value
         End Set
     End Property
-    Public Property SubAgeMax As String Implements ISettings.SubAgeMax
+    Public Property SubAgeMax As Integer Implements ISettings.SubAgeMax
         Get
             Return _settings.SubAgeMax
         End Get
@@ -3353,7 +3353,7 @@ Public Class MySettingsWrapper
             _settings.LongHoldMin = Value
         End Set
     End Property
-    Public Property LongHoldMax As String Implements ISettings.LongHoldMax
+    Public Property LongHoldMax As Integer Implements ISettings.LongHoldMax
         Get
             Return _settings.LongHoldMax
         End Get
@@ -3361,7 +3361,7 @@ Public Class MySettingsWrapper
             _settings.LongHoldMax = Value
         End Set
     End Property
-    Public Property ExtremeHoldMin As String Implements ISettings.ExtremeHoldMin
+    Public Property ExtremeHoldMin As Integer Implements ISettings.ExtremeHoldMin
         Get
             Return _settings.ExtremeHoldMin
         End Get
@@ -3369,7 +3369,7 @@ Public Class MySettingsWrapper
             _settings.ExtremeHoldMin = Value
         End Set
     End Property
-    Public Property ExtremeHoldMax As String Implements ISettings.ExtremeHoldMax
+    Public Property ExtremeHoldMax As Integer Implements ISettings.ExtremeHoldMax
         Get
             Return _settings.ExtremeHoldMax
         End Get
@@ -3657,7 +3657,7 @@ Public Class MySettingsWrapper
             _settings.CBURLPreview = Value
         End Set
     End Property
-    Public Property TaskStrokesMin As Decimal Implements ISettings.TaskStrokesMin
+    Public Property TaskStrokesMin As Integer Implements ISettings.TaskStrokesMin
         Get
             Return _settings.TaskStrokesMin
         End Get
@@ -3665,7 +3665,7 @@ Public Class MySettingsWrapper
             _settings.TaskStrokesMin = Value
         End Set
     End Property
-    Public Property TaskStrokesMax As Decimal Implements ISettings.TaskStrokesMax
+    Public Property TaskStrokesMax As Integer Implements ISettings.TaskStrokesMax
         Get
             Return _settings.TaskStrokesMax
         End Get
@@ -3673,7 +3673,7 @@ Public Class MySettingsWrapper
             _settings.TaskStrokesMax = Value
         End Set
     End Property
-    Public Property TaskStrokingTimeMin As Decimal Implements ISettings.TaskStrokingTimeMin
+    Public Property TaskStrokingTimeMin As Integer Implements ISettings.TaskStrokingTimeMin
         Get
             Return _settings.TaskStrokingTimeMin
         End Get
@@ -3681,7 +3681,7 @@ Public Class MySettingsWrapper
             _settings.TaskStrokingTimeMin = Value
         End Set
     End Property
-    Public Property TaskStrokingTimeMax As Decimal Implements ISettings.TaskStrokingTimeMax
+    Public Property TaskStrokingTimeMax As Integer Implements ISettings.TaskStrokingTimeMax
         Get
             Return _settings.TaskStrokingTimeMax
         End Get
@@ -3689,7 +3689,7 @@ Public Class MySettingsWrapper
             _settings.TaskStrokingTimeMax = Value
         End Set
     End Property
-    Public Property TaskEdgesMin As Decimal Implements ISettings.TaskEdgesMin
+    Public Property TaskEdgesMin As Integer Implements ISettings.TaskEdgesMin
         Get
             Return _settings.TaskEdgesMin
         End Get
@@ -3697,7 +3697,7 @@ Public Class MySettingsWrapper
             _settings.TaskEdgesMin = Value
         End Set
     End Property
-    Public Property TaskEdgesMax As Decimal Implements ISettings.TaskEdgesMax
+    Public Property TaskEdgesMax As Integer Implements ISettings.TaskEdgesMax
         Get
             Return _settings.TaskEdgesMax
         End Get
@@ -3705,7 +3705,7 @@ Public Class MySettingsWrapper
             _settings.TaskEdgesMax = Value
         End Set
     End Property
-    Public Property TaskEdgeHoldTimeMin As Decimal Implements ISettings.TaskEdgeHoldTimeMin
+    Public Property TaskEdgeHoldTimeMin As Integer Implements ISettings.TaskEdgeHoldTimeMin
         Get
             Return _settings.TaskEdgeHoldTimeMin
         End Get
@@ -3713,7 +3713,7 @@ Public Class MySettingsWrapper
             _settings.TaskEdgeHoldTimeMin = Value
         End Set
     End Property
-    Public Property TaskEdgeHoldTimeMax As Decimal Implements ISettings.TaskEdgeHoldTimeMax
+    Public Property TaskEdgeHoldTimeMax As Integer Implements ISettings.TaskEdgeHoldTimeMax
         Get
             Return _settings.TaskEdgeHoldTimeMax
         End Get
@@ -3721,7 +3721,7 @@ Public Class MySettingsWrapper
             _settings.TaskEdgeHoldTimeMax = Value
         End Set
     End Property
-    Public Property TaskCBTTimeMin As Decimal Implements ISettings.TaskCBTTimeMin
+    Public Property TaskCBTTimeMin As Integer Implements ISettings.TaskCBTTimeMin
         Get
             Return _settings.TaskCBTTimeMin
         End Get
@@ -3729,7 +3729,7 @@ Public Class MySettingsWrapper
             _settings.TaskCBTTimeMin = Value
         End Set
     End Property
-    Public Property TaskCBTTimeMax As Decimal Implements ISettings.TaskCBTTimeMax
+    Public Property TaskCBTTimeMax As Integer Implements ISettings.TaskCBTTimeMax
         Get
             Return _settings.TaskCBTTimeMax
         End Get

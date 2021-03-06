@@ -15,6 +15,12 @@ namespace Tai.Common
 {
     public partial class SessionState
     {
+        public bool DommeTyping { get; internal set; }
+        public bool C1Typing { get; internal set; }
+        public bool C2Typing { get; internal set; }
+        public bool C3Typing { get; internal set; }
+        public bool RndTyping { get; internal set; }
+
         [Serializable]
         public class StackedCallReturn : ScriptPosition
         {

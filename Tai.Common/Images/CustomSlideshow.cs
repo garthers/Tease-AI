@@ -12,27 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 using System.Runtime.Serialization;
 
-namespace Tai.Common {
-
-    public enum ImageGenre {
-
-        Blog,
-        Butt,
-        Boobs,
-        Hardcore,
-        Softcore,
-        Lesbian,
-        Blowjob,
-        Femdom,
-        Lezdom,
-        Hentai,
-        Gay,
-        Maledom,
-        Captions,
-        General,
-        Liked,
-        Disliked,
-    }
+namespace Tai.Common.Images {
 
 [Serializable]
 public class CustomSlideshow : Dictionary<string, ImageGenre>, ISerializable, IDeserializationCallback
