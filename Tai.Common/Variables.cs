@@ -33,7 +33,10 @@ namespace Tai.Common
             return File.Exists(Path.Combine(VariableFolder, varName));
         }
 
-
+        public void SetVariable(string varName, int value)
+        {
+            File.WriteAllText(Path.Combine(VariableFolder, varName), value.ToString());
+        }
         public void SetVariable(string varName, string value)
         {
             File.WriteAllText(Path.Combine(VariableFolder, varName), value);

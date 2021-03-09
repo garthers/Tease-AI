@@ -541,7 +541,7 @@ namespace Tai.Common
         /// <summary>Gets or sets current stack for @CallReturn( command.</summary>
         [Category("@CallReturn(")]
         [Browsable(false)]
-        public Stack CallReturns = new Stack();
+        public Stack<SessionState.StackedCallReturn> CallReturns = new Stack<SessionState.StackedCallReturn>();
 
         [Category("@CallReturn(")]
         [Description("Updated after returning to calling script.")]
@@ -674,8 +674,6 @@ namespace Tai.Common
         [Category("Images")]
         public ContactData SlideshowMasterDomme { get; set; }
         public int StrokePaceMem { get; set; }
-
-        public Random Rng => randomizer;
 
         public bool serialized_WMP_Visible;
         public string serialized_WMP_URL;
@@ -1344,26 +1342,5 @@ namespace Tai.Common
 #endif
             return true;
         }
-
-        public static string[] obtainSplitParts(string splitMe, bool isChat)
-        {
-            splitMe = "[" + splitMe + "] Null";
-            string[] Splits = splitMe.Split(new char[] { ']' });
-            Splits[0] = Splits[0].Replace("[", "");
-            do
-            {
-                Splits[0] = Splits[0].Replace("  ", " ");
-                Splits[0] = Splits[0].Replace(" ,", ",");
-                Splits[0] = Splits[0].Replace(", ", ",");
-                Splits[0] = Splits[0].Replace("'", "");
-            }
-            while (!!Splits[0].Contains("  ") & !Splits[0].Contains(", ") & !Splits[0].Contains(" ,") & !Splits[0].Contains("'"));
-            if (isChat)
-                // che(32) is the code for empty space - ' '
-                return Splits[0].Split(new char[] { ' ', ',' });
-            else
-                return Splits[0].Split(new char[] { ',' });
-        }
-
     }
 }

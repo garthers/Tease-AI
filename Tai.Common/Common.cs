@@ -124,7 +124,7 @@ namespace Tai.Common
                 // All Errors
                 // ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
                 Debug.WriteLine("Error removing TextLine: \"" + Searchpattern + "\" from file \"" + Filepath + "\": " + ex.ToString());
-                
+
                 return 0;
             }
         }
@@ -314,13 +314,13 @@ namespace Tai.Common
             {
                 Calendar currentCalendar = Thread.CurrentThread.CurrentCulture.Calendar; ;
                 DDiff = (currentCalendar.GetYear(date2) - currentCalendar.GetYear(date1)) * 12 + currentCalendar.GetMonth(date2) - currentCalendar.GetMonth(date1);
-                
+
             }
             else if (DateString.IndexOf("YEAR", StringComparison.CurrentCultureIgnoreCase) != -1)
             {
                 Calendar currentCalendar = Thread.CurrentThread.CurrentCulture.Calendar;
                 DDiff = currentCalendar.GetYear(date2) - currentCalendar.GetYear(date1);
-                
+
             }
             return DDiff;
         }
@@ -402,5 +402,24 @@ namespace Tai.Common
             return ParenFlag;
         }
 
+        public static string[] ObtainSplitParts(string splitMe, bool isChat)
+        {
+            splitMe = "[" + splitMe + "] Null";
+            string[] Splits = splitMe.Split(new char[] { ']' });
+            Splits[0] = Splits[0].Replace("[", "");
+            do
+            {
+                Splits[0] = Splits[0].Replace("  ", " ");
+                Splits[0] = Splits[0].Replace(" ,", ",");
+                Splits[0] = Splits[0].Replace(", ", ",");
+                Splits[0] = Splits[0].Replace("'", "");
+            }
+            while (!!Splits[0].Contains("  ") & !Splits[0].Contains(", ") & !Splits[0].Contains(" ,") & !Splits[0].Contains("'"));
+            if (isChat)
+                // che(32) is the code for empty space - ' '
+                return Splits[0].Split(new char[] { ' ', ',' });
+            else
+                return Splits[0].Split(new char[] { ',' });
+        }
     }
 }

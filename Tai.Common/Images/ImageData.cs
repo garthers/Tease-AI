@@ -38,28 +38,29 @@ namespace Tai.Common.Images
     ///     ''' This obejct is intended for managing Images. All Data and conditions can be stored in here
     ///     ''' and retrieved from it.
     ///     ''' </summary>
-    public class ImageSettings
+    public interface ImageSettings
     {
-        public string LikedImageUrlsPath { get; internal set; }
-        public string DislikedImageUrlsPath { get; internal set; }
-        public bool ForceLocalGif { get; internal set; }
-        public bool DisableLocalGif { get; internal set; }
-        public bool ForceRemoteGif { get; internal set; }
-        public bool DisableRemoteGif { get; internal set; }
-        public string NoLocalImagesFoundPath { get; internal set; }
-        public string NoUrlFilesSelectedPath { get; internal set; }
-        public string ImageTagListPath { get; internal set; }
+        string LikedImageUrlsPath { get;  }
+        string DislikedImageUrlsPath { get; }
+        bool ForceLocalGif { get; }
+        bool DisableLocalGif { get;}
+        bool ForceRemoteGif { get;  }
+        bool DisableRemoteGif { get;  }
+        string NoLocalImagesFoundPath { get; }
+        string NoUrlFilesSelectedPath { get; }
+        string ImageTagListPath { get;  }
 
-        internal IEnumerable<string> GetCheckedBlogImages()
+        IEnumerable<string> GetCheckedBlogImages();
+        /*
         {
             throw new NotImplementedException();
         }
+        */
+        string UrlFileDirPath { get; } //Application.StartupPath & "\Images\System\URL Files\"
+        string SystemImagesPath { get; } // Application.StartupPath & "\Images\System
 
-        public string UrlFileDirPath { get; set; } //Application.StartupPath & "\Images\System\URL Files\"
-        public string SystemImagesPath { get; set; } // Application.StartupPath & "\Images\System
-
-        public bool NoPornAllowed { get; set; }
-        public string LocalImageTagsPath { get; internal set; } // //Application.StartupPath + @"\Images\System\LocalImageTags.txt";
+        bool NoPornAllowed { get; }
+        string LocalImageTagsPath { get; } // //Application.StartupPath + @"\Images\System\LocalImageTags.txt";
     }
 }
 

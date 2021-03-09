@@ -88,7 +88,7 @@ namespace Tai.Common
         {
             for (int i = 0; i <= checkList.Count() - 1; i++)
             {
-                string[] list = SessionState.obtainSplitParts(checkList[i], false);
+                string[] list = Common.ObtainSplitParts(checkList[i], false);
                 for (int n = 0; n <= list.Count() - 1; n++)
                 {
                     
@@ -169,7 +169,7 @@ namespace Tai.Common
 
             // if all multiple words answers didn't return an answer, we check for the single words in the chat to see if any of them matches
 
-            var singleWords = SessionState.obtainSplitParts(chatstring, true);
+            var singleWords = Common.ObtainSplitParts(chatstring, true);
             for (int i = 0; i <= singleWords.Count() - 1; i++)
             {
                 for (int n = 0; n <= answerList.Count - 1; n++)

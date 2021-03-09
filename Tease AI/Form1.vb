@@ -19985,7 +19985,7 @@ playLoop:
 		Dim checkfor As New List(Of String)
 		Dim checkForHonorific As Boolean = True
 		Dim splitChat As String()
-		splitChat = ssh.obtainSplitParts(ssh.ChatString, True)
+		splitChat = Tai.Common.Common.ObtainSplitParts(ssh.ChatString, True)
 
 
 		'checkanswers is a new class which stores all the saved settings for hi,yes,no,sorry words that the used has chosen
@@ -20005,7 +20005,7 @@ playLoop:
 		End If
 
 		For i = 0 To checkfor.Count - 1
-			Dim SplitParts As String() = ssh.obtainSplitParts(checkfor(i), False)
+			Dim SplitParts As String() = Tai.Common.Common.ObtainSplitParts(checkfor(i), False)
 
 			For n As Integer = 0 To SplitParts.Length - 1
 				For m As Integer = 0 To splitChat.Length - 1

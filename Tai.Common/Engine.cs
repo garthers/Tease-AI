@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Timers;
 using Tai.Common.Images;
 
 namespace Tai.Common
@@ -26,7 +27,7 @@ namespace Tai.Common
         public char EdgesOwed { get; internal set; }
         public char TokensPaid { get; internal set; }
     }
-    public class Engine
+    public partial class Engine
     {
         private Regex _reKeywords;
         private Regex _reKeywordsCI;
@@ -45,7 +46,7 @@ namespace Tai.Common
         private readonly ILog _log;
         private readonly ImageData _imageData;
 
-        public Engine(string rootPath, string domPersonalityName, Chat chat, SessionState xssh, ISettings settings, ILog log)
+        public Engine(string rootPath, string domPersonalityName, Chat chat, SessionState xssh, ISettings settings, ILog log, ImageSettings imageSettings)
         {
             InitPoundClean();
             throw new NotImplementedException("Fix variables path");
@@ -57,7 +58,7 @@ namespace Tai.Common
             _chat = chat;
             ssh = xssh;
             _settings = settings;
-            var imageSettings = new ImageSettings();
+            //var imageSettings = new ImageSettings();
             _imageData = new ImageData(_settings, imageSettings, xssh.randomizer, log);
         }
 
@@ -2045,6 +2046,5 @@ namespace Tai.Common
                 return false;
             }
         }
-
     }
 }
