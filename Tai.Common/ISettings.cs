@@ -30,8 +30,8 @@ namespace Tai.Common
         string SubAvatarSave { get; set; }
         decimal NBCensorShowMin { get; set; }
         decimal NBCensorShowMax { get; set; }
-        decimal NBCensorHideMin { get; set; }
-        decimal NBCensorHideMax { get; set; }
+        int NBCensorHideMin { get; set; }
+        int NBCensorHideMax { get; set; }
         bool CBCensorConstant { get; set; }
         bool CBHardcoreD { get; set; }
         bool CBSoftcoreD { get; set; }

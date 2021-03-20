@@ -20,6 +20,7 @@ namespace Tai.Common
         public bool C2Typing { get; internal set; }
         public bool C3Typing { get; internal set; }
         public bool RndTyping { get; internal set; }
+        public bool CensorshipBarVisible { get; internal set; }
 
         [Serializable]
         public class StackedCallReturn : ScriptPosition

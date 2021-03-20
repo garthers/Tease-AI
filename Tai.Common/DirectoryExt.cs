@@ -178,9 +178,9 @@ namespace Tai.Common
         {
             try
             {
-                // Convert all Extensions to LowerCase
-                for (var i = 0; i <= filter.Count - 1; i++)
-                    filter[i] = filter[i].ToLower();
+                // Convert all Extensions to LowerCase (already lower case)
+                //for (var i = 0; i <= filter.Count - 1; i++)
+                //    filter[i] = filter[i].ToLower();
 
                 // Read get all Files with the given pattern
                 List<string> temp = DirectoryExt.GetFiles(path, "*", searchOption)
@@ -213,11 +213,26 @@ namespace Tai.Common
         /// 	''' <exception cref="Exception">Rethrows all exceptions.</exception>
         public static List<string> GetFilesVideo(string path, System.IO.SearchOption searchOption = System.IO.SearchOption.AllDirectories)
         {
-            List<string> supportedExtension = new List<string>() { ".wmv", ".avi", ".mp4", ".m4v", ".mpg", ".mov", ".flv", ".webm", ".mkv" };
-
-            return GetFilesExtension(path, supportedExtension, searchOption);
+            return GetFilesExtension(path, SupportedExtensions, searchOption);
         }
 
+        private static List<string> SupportedExtensions = new List<string>() { ".wmv", ".avi", ".mp4", ".m4v", ".mpg", ".mov", ".flv", ".webm", ".mkv" };
+
+        /// <summary>
+        ///  returns if any files exist without counting them!
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool AnyVideoFiles(string path)
+        {
+            foreach (var f in Directory.EnumerateFiles(path, "*", System.IO.SearchOption.AllDirectories)) 
+            {
+                if (SupportedExtensions.Contains(System.IO.Path.GetExtension(f), StringComparer.OrdinalIgnoreCase))
+                    return true;
+                //.Where(f => filter.Contains(System.IO.Path.GetExtension(f).ToLower())).ToList();
+            }
+            return false;
+        }
         /// =========================================================================================================
         /// 	''' <summary>
         /// 	''' Returns the names of videofiles (including their paths) in the specified directory, using a value 

@@ -4,29 +4,33 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Timers;
 
 namespace Tai.Common
 {
-#if false
     public partial class Engine
     {
-
-        private readonly Timer ScriptTimer;
-        private readonly Timer StrokeTimer;
-        private readonly Timer StrokeTauntTimer;
-        private readonly Timer EdgeTauntTimer;
-        private readonly Timer EdgeCountTimer;
-        private readonly Timer HoldEdgeTimer;
-        private readonly Timer HoldEdgeTauntTimer;
-        private readonly Timer CensorshipTimer;
-        private readonly Timer RLGLTimer;
-        private readonly Timer TnASlides;
-        private readonly Timer AvoidTheEdge;
-        private readonly Timer AvoidTheEdgeTaunts;
-        private readonly Timer RLGLTauntTimer;
-        private readonly Timer VideoTauntTimer;
-        private readonly Timer TimeoutTimer;
+        private readonly Timer ScriptTimer; // 1000 ms
+        private readonly Timer StrokeTimer; // 1000 ms
+        private readonly Timer StrokeTauntTimer; // 1000 ms
+        private readonly Timer EdgeTauntTimer; // 1000 ms?
+        private readonly Timer EdgeCountTimer; // 1000 ?
+        private readonly Timer HoldEdgeTimer; //
+        private readonly Timer HoldEdgeTauntTimer; //
+        private readonly Timer CensorshipTimer; // 1000
+        private readonly Timer RLGLTimer; // 10000
+        private readonly Timer TnASlides; // 5000,1000,334
+        private readonly Timer AvoidTheEdge; // 1k
+        private readonly Timer AvoidTheEdgeTaunts; // 1k
+        private readonly Timer RLGLTauntTimer; // 1000
+        private readonly Timer VideoTauntTimer; // 1000
+        private readonly Timer TimeoutTimer; // 1000
+        private readonly Timer TeaseTimer; // 1000
+        private readonly Timer VideoTimer; //
+        private readonly Timer MultipleEdgesTimer;
+        private readonly Timer WaitTimer; // 1000 ms
+        private readonly Timer StrokeTimeTotalTimer; // 1000ms
 
         private bool IsStrokeLinkEnabled(string path)
         {
@@ -502,8 +506,8 @@ namespace Tai.Common
             //if (ssh.DomTask.Contains("@ShowTaggedImage"))
             //    ssh.JustShowedBlogImage = true;
 
-           // if (ssh.DomTask.Contains("@NullResponse"))
-           //     ssh.NullResponse = true;
+            // if (ssh.DomTask.Contains("@NullResponse"))
+            //     ssh.NullResponse = true;
 
             if (ssh.HypnoGen == true)
             {
@@ -633,7 +637,7 @@ namespace Tai.Common
                 ssh.FileText = ssh.FileText + ".txt";
             }
             else
-                ssh.FileText = Path.Combine(DomPersonalityPath,@"Playlist/End", ssh.PlaylistFile[ssh.PlaylistCurrent] + ".txt");
+                ssh.FileText = Path.Combine(DomPersonalityPath, @"Playlist/End", ssh.PlaylistFile[ssh.PlaylistCurrent] + ".txt");
 
             if (!ssh.WorshipMode)
             {
@@ -721,7 +725,7 @@ namespace Tai.Common
                         }
                         else if (!TempLink.Contains("_CHASTITY"))
                             LinkList.Add(foundFile);
-                        
+
                     }
 
                     if (LinkList.Count < 1)
@@ -1126,6 +1130,22 @@ namespace Tai.Common
             return -1;
         }
 
+        private bool IsStrokeStartFileEnabled(string path)
+        {
+            return true;
+        }
+
+        public void ClearWriteTask()
+        {
+            ssh.dontCheck = true;
+            ssh.WritingTaskCurrentTime = 0;
+            ssh.WritingTaskFlag = false;
+            ssh.randomWriteTask = false;
+            //chatBox.ShortcutsEnabled = true;
+            //ChatBox2.ShortcutsEnabled = true;
+            //CloseApp(null/* TODO Change to default(_) if this is not a reference type */);
+        }
+
 
         private void sendButton_Click(string chatString)
         {
@@ -1181,7 +1201,8 @@ namespace Tai.Common
             }
 
             var bPauseCheck = false;
-            if (OnPauseCheck(out bPauseCheck))
+            OnPauseCheck(out bPauseCheck);
+            if (bPauseCheck)
             {
                 return;
             }
@@ -1212,7 +1233,7 @@ namespace Tai.Common
                 {
                     List<string> TaskList = new List<string>();
                     var startTasksPath = Path.Combine(DomPersonalityPath, "Interrupt/Start Tasks");
-                    foreach (string TaskFile in Directory.EnumerateFiles(Path.Combine(startTasksPath,"*.txt")))
+                    foreach (string TaskFile in Directory.EnumerateFiles(Path.Combine(startTasksPath, "*.txt")))
                         TaskList.Add(TaskFile);
 
                     if (TaskList.Count > 0)
@@ -1284,15 +1305,14 @@ namespace Tai.Common
 
                     // Lock Orgasm Chances if setting is activated. 
                     if (_settings.LockOrgasmChances)
-                        FrmSettings.LockOrgasmChances(true);
-
-                    if (ssh.PlaylistFile.Count == 0)
-                        goto NoPlaylistStartFile;
-
-                    if (ssh.Playlist == false | ssh.PlaylistFile(0).Contains("Random Start"))
                     {
-                    NoPlaylistStartFile:
-                        ;
+                        _log.WriteError("FrmSettings.LockOrgasmChances ignored.");
+                        //   FrmSettings.LockOrgasmChances(true);
+                    }
+
+
+                    if (ssh.Playlist == false || ssh.PlaylistFile[0].Contains("Random Start") || ssh.PlaylistFile.Count == 0)
+                    {
                         List<string> StartList = new List<string>();
                         StartList.Clear();
 
@@ -1302,30 +1322,27 @@ namespace Tai.Common
                         else
                             ChastityStartCheck = "*.txt";
 
-                        foreach (string foundFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Stroke\Start\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, ChastityStartCheck))
+                        var strokePathWildcard = Path.Combine(DomPersonalityPath, "Stroke", "Start");
+                        foreach (string foundFile in Directory.EnumerateFiles(strokePathWildcard, ChastityStartCheck))
                         {
                             string TempStart = foundFile;
                             TempStart = TempStart.Replace(".txt", "");
                             while (!!TempStart.Contains(@"\"))
                                 TempStart = TempStart.Remove(0, 1);
-                            for (int x = 0; x <= FrmSettings.CLBStartList.Items.Count - 1; x++)
-                            {
-                                if (_settings.Chastity == true)
-                                {
-                                    if (FrmSettings.CLBStartList.Items(x) == TempStart & FrmSettings.CLBStartList.GetItemChecked(x) == true)
-                                        StartList.Add(foundFile);
-                                }
-                                else if (FrmSettings.CLBStartList.Items(x) == TempStart & FrmSettings.CLBStartList.GetItemChecked(x) == true & !TempStart.Contains("_CHASTITY"))
-                                    StartList.Add(foundFile);
-                            }
+                            if (!IsStrokeStartFileEnabled(foundFile)) continue;
+
+                            if (_settings.Chastity)
+                                StartList.Add(foundFile);
+                            else if (!TempStart.Contains("_CHASTITY"))
+                                StartList.Add(foundFile);
                         }
 
                         if (StartList.Count < 1)
                         {
-                            if (_settings.Chastity == true)
-                                ssh.FileText = Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\System\Scripts\Start_CHASTITY.txt";
+                            if (_settings.Chastity)
+                                ssh.FileText = Path.Combine(DomPersonalityPath, "System/Scripts/Start_CHASTITY.txt");
                             else
-                                ssh.FileText = Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\System\Scripts\Start.txt";
+                                ssh.FileText = Path.Combine(DomPersonalityPath, "/System/Scripts/Start.txt");
                         }
                         else
                             ssh.FileText = StartList[ssh.randomizer.Next(0, StartList.Count)];
@@ -1333,23 +1350,23 @@ namespace Tai.Common
                     else
                     {
                         Debug.Print("Start situation found");
-                        if (ssh.PlaylistFile(0).Contains("Regular-TeaseAI-Script"))
+                        if (ssh.PlaylistFile[0].Contains("Regular-TeaseAI-Script"))
                         {
-                            ssh.FileText = Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Stroke\Start\" + ssh.PlaylistFile(0);
+                            ssh.FileText = Path.Combine(DomPersonalityPath, "Stroke/Start", ssh.PlaylistFile[0]);
                             ssh.FileText = ssh.FileText.Replace(" Regular-TeaseAI-Script", "");
                             ssh.FileText = ssh.FileText + ".txt";
                         }
                         else
-                            ssh.FileText = Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Playlist\Start\" + ssh.PlaylistFile(0) + ".txt";
+                            ssh.FileText = Path.Combine(DomPersonalityPath, "Playlist/Start", ssh.PlaylistFile[0] + ".txt");
                     }
 
-                    if (ssh.Playlist == true)
+                    if (ssh.Playlist)
                         ssh.PlaylistCurrent += 1;
-                    ssh.LastScriptCountdown = ssh.randomizer.Next(3, 5 * FrmSettings.domlevelNumBox.Value);
+                    ssh.LastScriptCountdown = ssh.randomizer.Next(3, 5 * _settings.DomLevel);
 
                     if (Directory.Exists(_settings.DomImageDir) & ssh.SlideshowLoaded == false)
                     {
-                        if (FrmSettings.CBRandomDomme.Checked == true)
+                        if (_settings.CBRandomDomme)
                             ssh.glitterDommeNumber = 4;
                         LoadDommeImageFolder();
                         InitDommeImageFolder();
@@ -1365,14 +1382,15 @@ namespace Tai.Common
 
 
 
-            if (ssh.SaidHello == false)
+            if (!ssh.SaidHello)
                 return;
 
-            if (UCase(ssh.ChatString) == UCase(FrmSettings.TBSafeword.Text))
+            if (ssh.ChatString.Equals(_settings.Safeword, StringComparison.OrdinalIgnoreCase))
             {
                 List<string> SafeList = new List<string>();
 
-                foreach (string SafeFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Safeword\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.txt"))
+                var safewordInterruptFolder = Path.Combine(DomPersonalityPath, "Interrupt", "Safeword");
+                foreach (string SafeFile in Directory.EnumerateFiles(safewordInterruptFolder, "*.txt"))
                     SafeList.Add(SafeFile);
 
                 if (SafeList.Count > 0)
@@ -1385,16 +1403,16 @@ namespace Tai.Common
                     ScriptTimer.Start();
                 }
                 else
-                    MessageBox.Show(this, "No files were found in " + Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Safeword!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                {
+                    _log.WriteError(" No files found in ", safewordInterruptFolder);
+                    //MessageBox.Show(this, "No files were found in " + Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Safeword!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                }
+
                 return;
             }
 
-            if (UCase(ssh.ChatString).Contains(Strings.UCase("stop")))
+            if (ssh.ChatString.Equals("stop", StringComparison.OrdinalIgnoreCase))
                 TnASlides.Stop();
-
-            // If UCase(ChatString).Contains(UCase("stop")) Then
-            // If CustomSlideshow = True Then CustomSlideshowTimer.Stop()
-            // End If
 
 
             WritingTaskLine:
@@ -1406,7 +1424,7 @@ namespace Tai.Common
                 // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 
                 // ##################### Evaluate Input ########################
-                bool InputWrong, TaskTimeout, TaskFailed, TaskSuccess;
+                bool InputWrong = false, TaskTimeout = false, TaskFailed = false, TaskSuccess = false;
 
                 if (ssh.ChatString == LBLWritingTaskText.Text)
                 {
@@ -1429,7 +1447,7 @@ namespace Tai.Common
                         TaskFailed = true;
                 }
 
-                if (ssh.WritingTaskCurrentTime < 1 & _settings.TimedWriting == true & ssh.WritingTaskFlag == true)
+                if (ssh.WritingTaskCurrentTime < 1 && _settings.TimedWriting && ssh.WritingTaskFlag)
                     TaskTimeout = true;
 
                 // ################# Generate output text ######################
@@ -1437,7 +1455,7 @@ namespace Tai.Common
                 string OutColor = "";
                 string OutHtml = "<span style=\"color:{0}\">{1}</span>";
 
-                if (TaskTimeout | TaskFailed | InputWrong)
+                if (TaskTimeout || TaskFailed || InputWrong)
                 {
                     if (TaskTimeout)
                         ProgrText = "Time Expired";
@@ -1467,8 +1485,8 @@ namespace Tai.Common
                 }
 
                 // ####################### Print output ########################
-                ChatAddMessage(_settings.SubName, string.Format(OutHtml, OutColor, ssh.ChatString), true);
-                ChatAddWritingTaskInfo(string.Format(OutHtml, OutColor, ProgrText));
+                _chat.ChatAddMessage(_settings.SubName, string.Format(OutHtml, OutColor, ssh.ChatString), true);
+                _chat.ChatAddWritingTaskInfo(string.Format(OutHtml, OutColor, ProgrText));
 
                 // ##################### Continue script? ######################
                 if (TaskTimeout | TaskFailed)
@@ -1492,7 +1510,7 @@ namespace Tai.Common
                     setWriteTask();
             }
 
-            if (ssh.AFK & !ssh.YesOrNo)
+            if (ssh.AFK && !ssh.YesOrNo)
                 return;
 
             // Previous Commas
@@ -1502,7 +1520,8 @@ namespace Tai.Common
 
 
             List<string> EdgeList = new List<string>();
-            EdgeList = Txt2List(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Vocabulary\Responses\System\EdgeKEY.txt");
+            var edgeKeyPath = Path.Combine(DomPersonalityPath, @"Vocabulary/Responses/System/EdgeKEY.txt");
+            EdgeList = Common.Txt2List(edgeKeyPath);
 
 
 
@@ -1523,15 +1542,16 @@ namespace Tai.Common
                 EdgeCheck = EdgeCheck.Replace(".", "");
                 EdgeCheck = EdgeCheck.Replace(",", "");
                 EdgeCheck = EdgeCheck.Replace("!", "");
-                if (Strings.UCase(EdgeCheck).Contains("DONT") | Strings.UCase(EdgeCheck).Contains("NEVER") | Strings.UCase(EdgeCheck).Contains("NOT"))
+                if (EdgeCheck.IndexOf("DONT", StringComparison.OrdinalIgnoreCase) >= 0 || EdgeCheck.IndexOf("NEVER", StringComparison.OrdinalIgnoreCase) >= 0
+                    || EdgeCheck.IndexOf("NOT", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    if (Strings.UCase(EdgeCheck).Contains(Strings.UCase(EdgeString)))
+                    if (EdgeCheck.IndexOf(EdgeString, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         ssh.EdgeNOT = true;
                         break;
                     }
                 }
-                if (Strings.UCase(EdgeString) == Strings.UCase(EdgeCheck))
+                if (EdgeString.Equals(EdgeCheck, StringComparison.CurrentCultureIgnoreCase))
                 {
                     ssh.EdgeFound = true;
                     break;
@@ -1540,14 +1560,14 @@ namespace Tai.Common
 
             Debug.Print("EdgeFOund 2 = " + ssh.EdgeFound);
 
-            if (ssh.EdgeFound == true & _settings.Chastity == false)
+            if (ssh.EdgeFound && !_settings.Chastity)
             {
                 Debug.Print("EdgeFOund = True Called");
 
                 ssh.EdgeFound = false;
 
 
-                if (ssh.SubHoldingEdge == true)
+                if (ssh.SubHoldingEdge)
                 {
                     Debug.Print("EdgeFOund = SubHoldingedge");
                     ssh.DomChat = " #YoureAlreadySupposedToBeClose";
@@ -1555,30 +1575,28 @@ namespace Tai.Common
                     return;
                 }
 
-                SetVariable("SYS_EdgeTotal", Val(GetVariable("SYS_EdgeTotal") + 1));
+                _vars.SetVariable("SYS_EdgeTotal", Int32.Parse(_vars.GetVariable("SYS_EdgeTotal")) + 1));
 
-                if (ssh.TauntEdging == true & ssh.SubEdging == false & ssh.ShowModule == false)
+                if (ssh.TauntEdging && !ssh.SubEdging && !ssh.ShowModule)
                 {
                     ssh.DomChat = "#SYS_TauntEdgingAsked";
                     TypingNoDelay();
 
                     // Recalculate TantEdging-Chance
-                    if (ssh.randomizer.Next(1, 101) <= FrmSettings.NBTauntEdging.Value)
+                    if (ssh.randomizer.Next(1, 101) <= _settings.TauntEdging)
                         ssh.TauntEdging = false;
 
                     return;
                 }
 
 
-                if (ssh.edgeMode.VideoMode == true)
+                if (ssh.edgeMode.VideoMode)
                 {
                     ssh.SessionEdges += 1;
                     ssh.edgeMode.VideoMode = false;
                     ssh.TeaseVideo = false;
                     VideoTimer.Stop();
-                    DomWMP.Visible = false;
-                    DomWMP.Ctlcontrols.stop();
-                    mainPictureBox.Visible = true;
+                    OnStopVideo();
                     ssh.FileGoto = ssh.edgeMode.GotoLine;
                     ssh.SkipGotoLine = true;
                     GetGoto();
@@ -1614,7 +1632,7 @@ namespace Tai.Common
                 }
 
 
-                if (ssh.AvoidTheEdgeStroking == true)
+                if (ssh.AvoidTheEdgeStroking)
                 {
                     Debug.Print("EdgeFOund = ATE");
 
@@ -1625,17 +1643,19 @@ namespace Tai.Common
                     ssh.VideoTease = false;
 
                     List<string> ATEList = new List<string>();
+                    var avoidTheEdgePath = Path.Combine(DomPersonalityPath, "Video/Avoid The Edge/Scripts");
 
-                    foreach (string foundFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Video\Avoid The Edge\Scripts\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.txt"))
+                    foreach (string foundFile in Directory.EnumerateFiles(avoidTheEdgePath, "*.txt"))
                         ATEList.Add(foundFile);
 
                     if (ATEList.Count < 1)
                     {
-                        MessageBox.Show(this, "No Avoid The Edge scripts were found!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                        //MessageBox.Show(this, "No Avoid The Edge scripts were found!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                        _log.WriteError($"No Avoid The Edge scripts were found in {avoidTheEdgePath}");
                         return;
                     }
 
-                    DomWMP.Ctlcontrols.pause();
+                    OnPauseControls();
 
                     ssh.StrokeTauntVal = -1;
                     ssh.FileText = ATEList[ssh.randomizer.Next(0, ATEList.Count)];
@@ -1646,7 +1666,7 @@ namespace Tai.Common
                 }
 
 
-                if (ssh.SubEdging == true)
+                if (ssh.SubEdging)
                 {
                     Debug.Print("EdgeFOund = SubEdging");
 
@@ -1677,7 +1697,7 @@ namespace Tai.Common
                         }
                     }
 
-                    if (ssh.AlreadyStrokingEdge == true)
+                    if (ssh.AlreadyStrokingEdge)
                     {
                         ssh.AvgEdgeCount += 1;
                         if (ssh.AvgEdgeStroking == 0)
@@ -1717,15 +1737,15 @@ namespace Tai.Common
                     else
                         FrmSettings.LBLAvgEdgeNoTouch.Text = "WAIT";
 
-                    if (FrmSettings.domlevelNumBox.Value == 1)
+                    if (_settings.DomLevel == 1)
                         ssh.HoldEdgeChance = 20;
-                    if (FrmSettings.domlevelNumBox.Value == 2)
+                    if (_settings.DomLevel == 2)
                         ssh.HoldEdgeChance = 25;
-                    if (FrmSettings.domlevelNumBox.Value == 3)
+                    if (_settings.DomLevel == 3)
                         ssh.HoldEdgeChance = 30;
-                    if (FrmSettings.domlevelNumBox.Value == 4)
+                    if (_settings.DomLevel == 4)
                         ssh.HoldEdgeChance = 40;
-                    if (FrmSettings.domlevelNumBox.Value == 5)
+                    if (_settings.DomLevel == 5)
                         ssh.HoldEdgeChance = 50;
 
                     int HoldEdgeInt = ssh.randomizer.Next(1, 101);
@@ -1762,32 +1782,32 @@ namespace Tai.Common
                         TypingNoDelay();
 
 
-                        if (ssh.EdgeHoldFlag == false)
+                        if (!ssh.EdgeHoldFlag)
                         {
                             ssh.HoldEdgeTick = ssh.HoldEdgeChance;
 
                             int HoldEdgeMin;
                             int HoldEdgeMax;
 
-                            HoldEdgeMin = FrmSettings.NBHoldTheEdgeMin.Value;
-                            if (FrmSettings.LBLMinHold.Text == "minutes")
+                            HoldEdgeMin = _settings.HoldTheEdgeMin;
+                            if (_settings.HoldTheEdgeMinAmount == "minutes")
                                 HoldEdgeMin *= 60;
 
-                            HoldEdgeMax = FrmSettings.NBHoldTheEdgeMax.Value;
-                            if (FrmSettings.LBLMaxHold.Text == "minutes")
+                            HoldEdgeMax = _settings.HoldTheEdgeMax;
+                            if (_settings.HoldTheEdgeMaxAmount == "minutes")
                                 HoldEdgeMax *= 60;
 
 
-                            if (ssh.ExtremeHold == true)
+                            if (ssh.ExtremeHold)
                             {
-                                HoldEdgeMin = FrmSettings.NBExtremeHoldMin.Value * 60;
-                                HoldEdgeMax = FrmSettings.NBExtremeHoldMax.Value * 60;
+                                HoldEdgeMin = _settings.ExtremeHoldMin * 60;
+                                HoldEdgeMax = _settings.ExtremeHoldMax * 60;
                             }
 
-                            if (ssh.LongHold == true)
+                            if (ssh.LongHold)
                             {
-                                HoldEdgeMin = FrmSettings.NBLongHoldMin.Value * 60;
-                                HoldEdgeMax = FrmSettings.NBLongHoldMax.Value * 60;
+                                HoldEdgeMin = _settings.LongHoldMin * 60;
+                                HoldEdgeMax = _settings.LongHoldMax * 60;
                             }
 
                             if (HoldEdgeMax < HoldEdgeMin)
@@ -1812,7 +1832,7 @@ namespace Tai.Common
                     }
                     else
                     {
-                        if (ssh.EdgeToRuin == true | ssh.OrgasmRuined == true)
+                        if (ssh.EdgeToRuin || ssh.OrgasmRuined)
                         {
                             ssh.LastOrgasmType = "RUINED";
                             ssh.OrgasmRuined = false;
@@ -1833,11 +1853,11 @@ namespace Tai.Common
                         {
                             ssh.LastOrgasmType = "DENIED";
 
-                            if (FrmSettings.CBDomDenialEnds.Checked == false & ssh.TeaseTick < 1)
+                            if (!_settings.DomDenialEnd && ssh.TeaseTick < 1)
                             {
                                 int RepeatChance = ssh.randomizer.Next(0, 101);
 
-                                if (RepeatChance < 10 * FrmSettings.domlevelNumBox.Value | (ssh.SecondSession & FrmSettings.CBDomDenialEnds.Checked == false))
+                                if (RepeatChance < 10 * _settings.DomLevel || (ssh.SecondSession && !_settings.DomDenialEnd))
                                 {
                                     ssh.SecondSession = false;
                                     ssh.SubEdging = false;
@@ -1846,28 +1866,29 @@ namespace Tai.Common
 
                                     List<string> RepeatList = new List<string>();
 
-                                    foreach (string foundFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Denial Continue\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.txt"))
+                                    var denialContinuePath = Path.Combine(DomPersonalityPath, "Interrupt/Denial Continue");
+                                    foreach (string foundFile in Directory.EnumerateFiles(denialContinuePath, "*.txt"))
                                         RepeatList.Add(foundFile);
 
                                     if (RepeatList.Count < 1)
                                         goto NoRepeatFiles;
 
 
-                                    if (FrmSettings.CBTeaseLengthDD.Checked == true)
+                                    if (_settings.CBTeaseLengthDD)
                                     {
-                                        if (FrmSettings.domlevelNumBox.Value == 1)
+                                        if (_settings.DomLevel == 1)
                                             ssh.TeaseTick = ssh.randomizer.Next(10, 16) * 60;
-                                        if (FrmSettings.domlevelNumBox.Value == 2)
+                                        if (_settings.DomLevel == 2)
                                             ssh.TeaseTick = ssh.randomizer.Next(15, 21) * 60;
-                                        if (FrmSettings.domlevelNumBox.Value == 3)
+                                        if (_settings.DomLevel == 3)
                                             ssh.TeaseTick = ssh.randomizer.Next(20, 31) * 60;
-                                        if (FrmSettings.domlevelNumBox.Value == 4)
+                                        if (_settings.DomLevel == 4)
                                             ssh.TeaseTick = ssh.randomizer.Next(30, 46) * 60;
-                                        if (FrmSettings.domlevelNumBox.Value == 5)
+                                        if (_settings.DomLevel == 5)
                                             ssh.TeaseTick = ssh.randomizer.Next(45, 61) * 60;
                                     }
                                     else
-                                        ssh.TeaseTick = ssh.randomizer.Next(FrmSettings.NBTeaseLengthMin.Value * 60, FrmSettings.NBTeaseLengthMax.Value * 60);
+                                        ssh.TeaseTick = ssh.randomizer.Next(_settings.TeaseLengthMin * 60, _settings.TeaseLengthMax * 60);
                                     TeaseTimer.Start();
 
                                     ssh.OrgasmYesNo = false;
@@ -1919,14 +1940,14 @@ namespace Tai.Common
 
                 RuinedOrgasm:
                     ;
-                    _settings.LastRuined = Strings.FormatDateTime(DateTime.Now, DateFormat.ShortDate);
+                    _settings.LastRuined = DateTime.Now;
                     FrmSettings.LBLLastRuined.Text = _settings.LastRuined;
 
-                    if (FrmSettings.CBDomOrgasmEnds.Checked == false & ssh.OrgasmRuined == true & ssh.TeaseTick < 1)
+                    if (!_settings.DomOrgasmEnd && ssh.OrgasmRuined && ssh.TeaseTick < 1)
                     {
                         int RepeatChance = ssh.randomizer.Next(0, 101);
 
-                        if (RepeatChance < 8 * FrmSettings.domlevelNumBox.Value | (ssh.SecondSession & FrmSettings.CBDomDenialEnds.Checked == false))
+                        if (RepeatChance < 8 * _settings.DomLevel || (ssh.SecondSession && !_settings.DomDenialEnd))
                         {
                             ssh.SecondSession = false;
                             ssh.SubEdging = false;
@@ -1937,28 +1958,29 @@ namespace Tai.Common
 
                             List<string> RepeatList = new List<string>();
 
-                            foreach (string foundFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Ruin Continue\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.txt"))
+                            var ruinContinuePath = Path.Combine(DomPersonalityPath, "Interrupt/Ruin Continue");
+                            foreach (string foundFile in Directory.EnumerateFiles(ruinContinuePath, "*.txt"))
                                 RepeatList.Add(foundFile);
 
                             if (RepeatList.Count < 1)
                                 goto NoRepeatRFiles;
 
 
-                            if (FrmSettings.CBTeaseLengthDD.Checked == true)
+                            if (_settings.CBTeaseLengthDD)
                             {
-                                if (FrmSettings.domlevelNumBox.Value == 1)
+                                if (_settings.DomLevel == 1)
                                     ssh.TeaseTick = ssh.randomizer.Next(10, 16) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 2)
+                                if (_settings.DomLevel == 2)
                                     ssh.TeaseTick = ssh.randomizer.Next(15, 21) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 3)
+                                if (_settings.DomLevel == 3)
                                     ssh.TeaseTick = ssh.randomizer.Next(20, 31) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 4)
+                                if (_settings.DomLevel == 4)
                                     ssh.TeaseTick = ssh.randomizer.Next(30, 46) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 5)
+                                if (_settings.DomLevel == 5)
                                     ssh.TeaseTick = ssh.randomizer.Next(45, 61) * 60;
                             }
                             else
-                                ssh.TeaseTick = ssh.randomizer.Next(FrmSettings.NBTeaseLengthMin.Value * 60, FrmSettings.NBTeaseLengthMax.Value * 60);
+                                ssh.TeaseTick = ssh.randomizer.Next(_settings.TeaseLengthMin * 60, _settings.TeaseLengthMax * 60);
                             TeaseTimer.Start();
 
                             ssh.OrgasmYesNo = false;
@@ -2019,8 +2041,8 @@ namespace Tai.Common
                         if (_settings.OrgasmsRemaining < 1)
                         {
                             List<string> NoCumList = new List<string>();
-
-                            foreach (string foundFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Out of Orgasms\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.txt"))
+                            var outOfOrgasmsPath = Path.Combine(DomPersonalityPath, "Interrupt/Out of Orgasms");
+                            foreach (string foundFile in Directory.EnumerateFiles(outOfOrgasmsPath, "*.txt"))
                                 NoCumList.Add(foundFile);
 
                             if (NoCumList.Count < 1)
@@ -2049,14 +2071,14 @@ namespace Tai.Common
 
                 NoNoCumFiles:
                     ;
-                    _settings.LastOrgasm = Strings.FormatDateTime(DateTime.Now, DateFormat.ShortDate);
+                    _settings.LastOrgasm = DateTime.Now;
                     FrmSettings.LBLLastOrgasm.Text = _settings.LastOrgasm;
 
-                    if (FrmSettings.CBDomOrgasmEnds.Checked == false & ssh.TeaseTick < 1)
+                    if (!_settings.DomOrgasmEnd && ssh.TeaseTick < 1)
                     {
                         int RepeatChance = ssh.randomizer.Next(0, 101);
 
-                        if (RepeatChance < 4 * FrmSettings.domlevelNumBox.Value | (ssh.SecondSession & FrmSettings.CBDomDenialEnds.Checked == false))
+                        if (RepeatChance < 4 * _settings.DomLevel || (ssh.SecondSession && !_settings.DomOrgasmEnd))
                         {
                             ssh.SecondSession = false;
                             ssh.SubEdging = false;
@@ -2064,29 +2086,29 @@ namespace Tai.Common
                             EdgeTauntTimer.Stop();
 
                             List<string> RepeatList = new List<string>();
-
-                            foreach (string foundFile in My.Computer.FileSystem.GetFiles(Application.StartupPath + @"\Scripts\" + dompersonalitycombobox.Text + @"\Interrupt\Orgasm Continue\", Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.txt"))
+                            var orgasmContinuePath = Path.Combine(DomPersonalityPath, "Interrupt/Orgasm Continue");
+                            foreach (string foundFile in Directory.EnumerateFiles(orgasmContinuePath, "*.txt"))
                                 RepeatList.Add(foundFile);
 
                             if (RepeatList.Count < 1)
                                 goto NoRepeatOFiles;
 
 
-                            if (FrmSettings.CBTeaseLengthDD.Checked == true)
+                            if (_settings.CBTeaseLengthDD)
                             {
-                                if (FrmSettings.domlevelNumBox.Value == 1)
+                                if (_settings.DomLevel == 1)
                                     ssh.TeaseTick = ssh.randomizer.Next(10, 16) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 2)
+                                if (_settings.DomLevel == 2)
                                     ssh.TeaseTick = ssh.randomizer.Next(15, 21) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 3)
+                                if (_settings.DomLevel == 3)
                                     ssh.TeaseTick = ssh.randomizer.Next(20, 31) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 4)
+                                if (_settings.DomLevel == 4)
                                     ssh.TeaseTick = ssh.randomizer.Next(30, 46) * 60;
-                                if (FrmSettings.domlevelNumBox.Value == 5)
+                                if (_settings.DomLevel == 5)
                                     ssh.TeaseTick = ssh.randomizer.Next(45, 61) * 60;
                             }
                             else
-                                ssh.TeaseTick = ssh.randomizer.Next(FrmSettings.NBTeaseLengthMin.Value * 60, FrmSettings.NBTeaseLengthMax.Value * 60);
+                                ssh.TeaseTick = ssh.randomizer.Next(_settings.TeaseLengthMin * 60, _settings.TeaseLengthMax * 60);
                             TeaseTimer.Start();
 
                             ssh.OrgasmYesNo = false;
@@ -2146,7 +2168,7 @@ namespace Tai.Common
                 {
                     int TauntStop = ssh.randomizer.Next(1, 101);
 
-                    if (TauntStop <= FrmSettings.NBTauntEdging.Value)
+                    if (TauntStop <= _settings.TauntEdging)
                     {
                         ssh.FirstRound = false;
                         // ShowModule = True
@@ -2177,10 +2199,13 @@ namespace Tai.Common
                             }
                             TypingNoDelay();
 
+                            // bad bad bad - allows other events to update state while we're sitting here.
+                            /*
                             do
                                 Application.DoEvents();
                             while (!ssh.DomTypeCheck == false);
-
+                            */
+                            _log.WriteError("Dom typecheck test commented out");
                             ssh.BookmarkModule = false;
                             ssh.FileText = ssh.BookmarkModuleFile;
                             ssh.StrokeTauntVal = ssh.BookmarkModuleLine;
@@ -2217,7 +2242,7 @@ namespace Tai.Common
         DebugAwareness:
             ;
             if (ssh.InputFlag == true & ssh.DomTypeCheck == false)
-                SetVariable(ssh.InputString, ssh.ChatString);
+                _vars.SetVariable(ssh.InputString, ssh.ChatString);
 
             // Remove commas and apostrophes from user's entered text
             ssh.ChatString = ssh.ChatString.Replace(",", "");
@@ -2225,7 +2250,9 @@ namespace Tai.Common
             ssh.ChatString = ssh.ChatString.Replace(".", "");
 
 
-            if (UCase(ssh.ChatString) == Strings.UCase("CAME") | UCase(ssh.ChatString) == Strings.UCase("I CAME") | UCase(ssh.ChatString) == Strings.UCase("JUST CAME") | UCase(ssh.ChatString) == Strings.UCase("I JUST CAME"))
+            if (ssh.ChatString.Equals("CAME", StringComparison.OrdinalIgnoreCase) ||
+                ssh.ChatString.Equals("I CAME", StringComparison.OrdinalIgnoreCase) || ssh.ChatString.Equals("JUST CAME", StringComparison.OrdinalIgnoreCase)
+                || ssh.ChatString.Equals("I JUST CAME", StringComparison.OrdinalIgnoreCase))
             {
                 if (ssh.cameMode.MessageMode == true)
                 {
@@ -2234,7 +2261,9 @@ namespace Tai.Common
                 }
             }
 
-            if (UCase(ssh.ChatString) == Strings.UCase("RUINED") | UCase(ssh.ChatString) == Strings.UCase("I RUINED") | UCase(ssh.ChatString) == Strings.UCase("RUINED IT") | UCase(ssh.ChatString) == Strings.UCase("I RUINED IT"))
+            if (ssh.ChatString.Equals("RUINED", StringComparison.OrdinalIgnoreCase) ||
+                ssh.ChatString.Equals("I RUINED", StringComparison.OrdinalIgnoreCase) || ssh.ChatString.Equals("RUINED IT", StringComparison.OrdinalIgnoreCase)
+                || ssh.ChatString.Equals("I RUINED IT", StringComparison.OrdinalIgnoreCase))
             {
                 if (ssh.ruinMode.MessageMode == true)
                 {
@@ -2265,7 +2294,1001 @@ namespace Tai.Common
             DomResponse();
         }
 
-        private bool OnPauseCheck(out bool bPauseCheck)
+
+        public void DomResponse()
+        {
+            if (ssh.WritingTaskFlag)
+                return;
+
+            if (ssh.dontCheck)
+            {
+                ssh.dontCheck = false;
+                return;
+            }
+
+            Debug.Print("DomResponse Called");
+            if (ssh.justStarted)
+                ssh.justStarted = false;
+            else if (checkSubAnswer(null/* Conversion error: Set to default value for this argument */, false) == 0)
+            {
+                checkForPunish();
+                return;
+            }
+
+            if (ssh.InputFlag == true)
+            {
+                ssh.InputFlag = false;
+                return;
+            }
+
+            if (ssh.EdgeNOT == true)
+            {
+                ssh.EdgeNOT = false;
+                var responseFile = Path.Combine(DomPersonalityPath, "Vocabulary/Responses/System/EdgeNOT.txt");
+                ssh.ResponseFile = responseFile;
+                goto FoundResponse;
+            }
+
+
+            string CheckResponse = ssh.ChatString.ToUpper();
+            CheckResponse = CheckResponse.Replace(ssh.tempDomName.ToUpper(), "");
+            if (ssh.tempHonorific != "")
+                CheckResponse = CheckResponse.Replace(ssh.tempHonorific.ToUpper(), "");
+
+            // Reduce 'multiple space chars' to a single 
+            // Remove all ,'!?.* while converting all to upper.
+            CheckResponse = Regex.Replace(CheckResponse, @"( )[ ]*|[,'!?\.*]", "$1").ToUpper();
+            CheckResponse = CheckResponse.Trim();
+
+
+            if (CheckResponse.Equals("CAME", StringComparison.OrdinalIgnoreCase) || CheckResponse.Equals("I CAME", StringComparison.OrdinalIgnoreCase))
+            {
+                if (ssh.cameMode.GotoMode == true)
+                {
+                    ssh.cameMode.GotoMode = false;
+                    WaitTimer.Stop();
+                    if (TimeoutTimer.Enabled == true)
+                    {
+                        TimeoutTimer.Stop();
+                        ssh.YesOrNo = false;
+                        ssh.InputFlag = false;
+                    }
+                    ssh.FileGoto = ssh.cameMode.GotoLine;
+                    ssh.SkipGotoLine = true;
+                    GetGoto();
+                    return;
+                }
+                if (ssh.cameMode.VideoMode)
+                {
+                    ssh.cameMode.VideoMode = false;
+                    ssh.TeaseVideo = false;
+                    VideoTimer.Stop();
+                    OnStopVideo();
+                    /*
+                    DomWMP.Visible = false;
+                    DomWMP.Ctlcontrols.stop();
+                    mainPictureBox.Visible = true;
+                    */
+                    ssh.FileGoto = ssh.cameMode.GotoLine;
+                    ssh.SkipGotoLine = true;
+                    GetGoto();
+                    return;
+                }
+            }
+
+
+            if (CheckResponse.Equals("RUINED", StringComparison.OrdinalIgnoreCase) ||
+                CheckResponse.Equals("I RUINED", StringComparison.OrdinalIgnoreCase) ||
+                CheckResponse.Equals("RUINED IT", StringComparison.OrdinalIgnoreCase) ||
+                CheckResponse.Equals("I RUINED IT", StringComparison.OrdinalIgnoreCase))
+            {
+                if (ssh.ruinMode.GotoMode == true)
+                {
+                    ssh.ruinMode.GotoMode = false;
+                    WaitTimer.Stop();
+                    if (TimeoutTimer.Enabled == true)
+                    {
+                        TimeoutTimer.Stop();
+                        ssh.YesOrNo = false;
+                        ssh.InputFlag = false;
+                    }
+                    ssh.FileGoto = ssh.ruinMode.GotoLine;
+                    ssh.SkipGotoLine = true;
+                    GetGoto();
+                    return;
+                }
+                if (ssh.ruinMode.VideoMode == true)
+                {
+                    ssh.ruinMode.VideoMode = false;
+                    ssh.TeaseVideo = false;
+                    VideoTimer.Stop();
+                    OnStopVideo();
+
+                    //DomWMP.Visible = false;
+                    //DomWMP.Ctlcontrols.stop();
+                    //mainPictureBox.Visible = true;
+                    ssh.FileGoto = ssh.ruinMode.GotoLine;
+                    ssh.SkipGotoLine = true;
+                    GetGoto();
+                    return;
+                }
+            }
+
+            if (ssh.Modes.Count > 0)
+            {
+                if (ssh.Modes.Keys.Contains(CheckResponse))
+                {
+                    if (ssh.Modes[CheckResponse].Type.IndexOf("GOTO", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        WaitTimer.Stop();
+                        if (TimeoutTimer.Enabled == true)
+                        {
+                            TimeoutTimer.Stop();
+                            ssh.YesOrNo = false;
+                            ssh.InputFlag = false;
+                        }
+                        ssh.FileGoto = ssh.Modes[CheckResponse].GotoLine;
+                        ssh.SkipGotoLine = true;
+                        GetGoto();
+                        ssh.Modes.Remove(CheckResponse);
+                        return;
+                    }
+                    if (ssh.Modes[CheckResponse].Type.IndexOf("VIDEO", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        ssh.TeaseVideo = false;
+                        VideoTimer.Stop();
+                        OnStopVideo();
+                        //DomWMP.Visible = false;
+                        //DomWMP.Ctlcontrols.stop();
+                        //mainPictureBox.Visible = true;
+                        ssh.FileGoto = ssh.Modes[CheckResponse].GotoLine;
+                        ssh.SkipGotoLine = true;
+                        GetGoto();
+                        ssh.Modes.Remove(CheckResponse);
+                        return;
+                    }
+                }
+            }
+
+
+            ssh.ResponseFile = "";
+
+            string YesSplit = _settings.SubYes;
+
+            do
+            {
+                YesSplit = YesSplit.Replace("  ", " ");
+                YesSplit = YesSplit.Replace(" ,", ",");
+                YesSplit = YesSplit.Replace(", ", ",");
+                YesSplit = YesSplit.Replace("'", "");
+            }
+            while (YesSplit.Contains("  ") || YesSplit.Contains(", ") || YesSplit.Contains(" ,") || YesSplit.Contains("'"));
+
+            if (ssh.yesMode.GotoMode == true)
+            {
+                string[] SplitParts = YesSplit.Split(new char[] { ',' });
+                for (int i = 0; i <= SplitParts.Count() - 1; i++)
+                {
+                    if (CheckResponse.Equals(SplitParts[i], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ssh.yesMode.GotoMode = false;
+                        WaitTimer.Stop();
+                        if (TimeoutTimer.Enabled == true)
+                        {
+                            TimeoutTimer.Stop();
+                            ssh.YesOrNo = false;
+                            ssh.InputFlag = false;
+                        }
+                        ssh.FileGoto = ssh.yesMode.GotoLine;
+                        ssh.SkipGotoLine = true;
+                        GetGoto();
+                    }
+                }
+                if (ssh.yesMode.GotoMode == false)
+                    return;
+            }
+
+            if (ssh.yesMode.VideoMode == true)
+            {
+                string[] SplitParts = YesSplit.Split(new char[] { ',' });
+                for (int i = 0; i <= SplitParts.Count() - 1; i++)
+                {
+                    if (CheckResponse.Equals(SplitParts[i], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ssh.yesMode.VideoMode = false;
+                        ssh.TeaseVideo = false;
+                        VideoTimer.Stop();
+                        OnStopVideo();
+                        //DomWMP.Visible = false;
+                        //DomWMP.Ctlcontrols.stop();
+                        //mainPictureBox.Visible = true;
+                        ssh.FileGoto = ssh.yesMode.GotoLine;
+                        ssh.SkipGotoLine = true;
+                        GetGoto();
+                    }
+                }
+                if (ssh.yesMode.VideoMode == false)
+                    return;
+            }
+
+            var responseYesFile = Path.Combine(DomPersonalityPath, $"Vocabulary/Responses/{ssh.ResponseYes}.txt");
+            if (!string.IsNullOrEmpty(ssh.ResponseYes) && File.Exists(responseYesFile))
+            {
+                string[] SplitParts = YesSplit.Split(new char[] { ',' });
+
+                for (int i = 0; i <= SplitParts.Length - 1; i++)
+                {
+                    if (CheckResponse.Equals(SplitParts[i], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ssh.ResponseFile = responseYesFile;
+                        goto FoundResponse;
+                    }
+                }
+            }
+
+            string NoSplit = _settings.SubNo;
+
+            do
+            {
+                NoSplit = NoSplit.Replace("  ", " ");
+                NoSplit = NoSplit.Replace(" ,", ",");
+                NoSplit = NoSplit.Replace(", ", ",");
+                NoSplit = NoSplit.Replace("'", "");
+            }
+            while (NoSplit.Contains("  ") || NoSplit.Contains(", ") || NoSplit.Contains(" ,") || NoSplit.Contains("'"));
+
+            if (ssh.noMode.GotoMode == true)
+            {
+                string[] SplitParts = NoSplit.Split(new char[] { ',' });
+                for (int i = 0; i <= SplitParts.Count() - 1; i++)
+                {
+                    if (CheckResponse.Equals(SplitParts[i], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ssh.noMode.GotoMode = false;
+                        WaitTimer.Stop();
+                        if (TimeoutTimer.Enabled == true)
+                        {
+                            TimeoutTimer.Stop();
+                            ssh.YesOrNo = false;
+                            ssh.InputFlag = false;
+                        }
+                        ssh.FileGoto = ssh.noMode.GotoLine;
+                        ssh.SkipGotoLine = true;
+                        GetGoto();
+                    }
+                }
+                if (ssh.noMode.GotoMode == false)
+                    return;
+            }
+
+            if (ssh.noMode.VideoMode == true)
+            {
+                string[] SplitParts = NoSplit.Split(new char[] { ',' });
+                for (int i = 0; i <= SplitParts.Count() - 1; i++)
+                {
+                    if (CheckResponse.Equals(SplitParts[i], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ssh.noMode.VideoMode = false;
+                        ssh.TeaseVideo = false;
+                        VideoTimer.Stop();
+                        OnStopVideo();
+                        //DomWMP.Visible = false;
+                        //DomWMP.Ctlcontrols.stop();
+                        //mainPictureBox.Visible = true;
+                        ssh.FileGoto = ssh.noMode.GotoLine;
+                        ssh.SkipGotoLine = true;
+                        GetGoto();
+                    }
+                }
+                if (ssh.noMode.VideoMode == false)
+                    return;
+            }
+
+            var responseNoFile = Path.Combine(DomPersonalityPath, $"Vocabulary/Responses/{ssh.ResponseNo}.txt");
+            if (!string.IsNullOrEmpty(ssh.ResponseNo)  && File.Exists(responseNoFile))
+            {
+                string[] SplitParts = NoSplit.Split(new char[] { ',' });
+
+                for (int i = 0; i <= SplitParts.Length - 1; i++)
+                {
+                    if (CheckResponse.Equals(SplitParts[i], StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ssh.ResponseFile = responseNoFile;
+                        goto FoundResponse;
+                    }
+                }
+            }
+
+            if (!ssh.BeforeTease)
+            {
+                if (CheckResponse.IndexOf("I have an orgasm", StringComparison.OrdinalIgnoreCase) >= 0 || 
+                        CheckResponse.IndexOf("me have an orgasm", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    if (ssh.TeaseTick > 0)
+                    {
+                        var begToCumFile = Path.Combine(DomPersonalityPath, @"Vocabulary/Responses/System/BegToCum.txt");
+                        ssh.ResponseFile = begToCumFile;
+                        if (!_settings.Chastity && !ssh.OrgasmRestricted)
+                            ssh.TeaseTick = ssh.TeaseTick / 2;
+                        Debug.Print("LastScriptCountdown = " + ssh.LastScriptCountdown);
+                        if (ssh.TeaseTick < 1 & ssh.Playlist == false & ssh.OrgasmRestricted == false)
+                        {
+                            StrokeTimer.Stop();
+                            StrokeTauntTimer.Stop();
+                            EdgeTauntTimer.Stop();
+                            ssh.SubStroking = false;
+                            ssh.SubEdging = false;
+                            RunLastBegScript();
+                            return;
+                        }
+                        else
+                            goto FoundResponse;
+                    }
+                }
+            }
+
+
+
+            CheckResponse = CheckResponse.Replace("  ", " ");
+
+            // ############ Load all system response Keyfiles ##############
+            // Dictionary to temporary store the system response keyphrases.
+            // This is used when there is no precise match, to search those phrases again.
+            Dictionary<string, List<string>> SysKeys = new Dictionary<string, List<string>>();
+
+            var systemResponsePath = Path.Combine(DomPersonalityPath, "Vocabulary/Responses/System");
+            foreach (string foundFile in Directory.EnumerateFiles(systemResponsePath, "*KEY.txt"))
+            {
+                if (Path.GetFileName(foundFile).Equals("EdgeKEY.txt", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                List<string> SysKeyList = Common.Txt2List(foundFile);
+
+                for (int i = 0; i <= SysKeyList.Count - 1; i++)
+                    // Reduce 'multiple space chars' to a single 
+                    // Remove all ,'!?.* while converting all to upper.
+                    SysKeyList[i] = Regex.Replace(SysKeyList[i], @"( )[ ]*|[,'!?\.*]", "$1").ToUpper();
+
+                SysKeys.Add(foundFile, SysKeyList);
+
+                // If there is a precise match, all work is done.
+                if (SysKeyList.Contains(CheckResponse))
+                {
+                    ssh.ResponseFile = foundFile.Replace("KEY", "");
+                    if (Regex.IsMatch(CheckResponse, "dont|never|not", RegexOptions.IgnoreCase))
+                        ssh.ResponseFile = ssh.ResponseFile.Replace(".txt", "NOT.txt");
+                    goto FoundResponse;
+                }
+            }
+
+            // ############## Load all response-files keyphrases ###########
+            // Dictionary to temporary store the response keyphrases. 
+            // This is used when there is no precise match, to search those phrases again.
+            Dictionary<string, List<string>> RespKeys = new Dictionary<string, List<string>>();
+
+            var responsePath = Path.Combine(DomPersonalityPath, "Vocabulary/Responses");
+            foreach (string foundFile in Directory.EnumerateFiles(responsePath, "*.txt"))
+            {
+                string FirstLine = Common.TxtReadLine(foundFile);
+
+                // Remove '[' and all text before as well as ']' and all text afterwards.
+                FirstLine = Regex.Replace(FirstLine, @"^.*\[|\].*$", "", RegexOptions.Singleline);
+
+                if (FirstLine.Contains("#"))
+                    FirstLine = PoundClean(FirstLine, PoundOptions.CommaSepList);
+
+                // Remove 'multiple whitespaces', '[', '] and following text', apostrophe char and convert all to upper.
+                FirstLine = Regex.Replace(FirstLine, @"(\s)\s*|\[|\].*|'", "$1", RegexOptions.Singleline).ToUpper();
+
+                // Split the line using one or more commas, surrounded by zero or more whitechars.
+                List<string> Keys = Regex.Split(FirstLine, @"\s*,+\s*", RegexOptions.None).ToList();
+
+                RespKeys.Add(foundFile, Keys);
+
+                // If there is a precise match, all work is done.
+                if (Keys.Contains(CheckResponse))
+                {
+                    ssh.ResponseFile = foundFile;
+                    goto FoundResponse;
+                }
+            }
+
+            // Check if a system repsonses keyphrase is within the text.
+            foreach (string Fp in SysKeys.Keys)
+            {
+                if (SysKeys[Fp].Exists(x =>
+                {
+                    return CheckResponse.IndexOf(x, StringComparison.OrdinalIgnoreCase) != -1;
+                }))
+                {
+                    ssh.ResponseFile = Fp.Replace("KEY", "");
+                    if (Regex.IsMatch(CheckResponse, "dont|never|not", RegexOptions.IgnoreCase))
+                        ssh.ResponseFile = ssh.ResponseFile.Replace(".txt", "NOT.txt");
+
+                    goto FoundResponse;
+                }
+            }
+
+            // Check if a vocab keyphrase is within the entered text. Longer keyphrases are prioritized.
+            int AccuracyLoop = 6;
+
+            while (AccuracyLoop > 0)
+            {
+                foreach (string Fp in RespKeys.Keys)
+                {
+                    if (RespKeys[Fp].Exists(x =>
+                    {
+                        return CheckResponse.Contains(x) && CountWords(x) > AccuracyLoop;
+                    }))
+                    {
+                        ssh.ResponseFile = Fp;
+                        goto FoundResponse;
+                    }
+                }
+                AccuracyLoop -= 1;
+            }
+
+            // Check if all words from a response keyphrase are present in any order.
+            foreach (string FilePath in RespKeys.Keys.AsParallel())
+            {
+                if (RespKeys[FilePath].Exists(phrase =>
+                {
+                    foreach (string Word in phrase.Split())
+                    {
+                        if (!CheckResponse.Contains(Word))
+                            return false;
+                    }
+
+                    return true;
+                }))
+                {
+                    ssh.ResponseFile = FilePath;
+                    goto FoundResponse;
+                }
+            }
+
+
+
+            if (ssh.CBTCockFlag|| ssh.CBTBallsFlag || ssh.CBTBothFlag || ssh.CustomTask)
+            {
+                ssh.TasksCount -= 1;
+                if (ssh.TasksCount < 1)
+                {
+                    ssh.CBTCockFlag = false;
+                    ssh.CBTBallsFlag = false;
+                    ssh.CBTBothFlag = false;
+                    ssh.CustomTask = false;
+                    ssh.CBTBallsFirst = true;
+                    ssh.CBTCockFirst = true;
+                    ssh.CBTBothFirst = true;
+                    ssh.CustomTaskFirst = true;
+                    ssh.ScriptTick = 3;
+                    ScriptTimer.Start();
+                    if (ssh.YesOrNo)
+                    {
+                        ssh.DomChat = "#SYS_ReturnAnswer";
+                        TypingDelay();
+                        return;
+                    }
+                }
+            }
+
+            if (ssh.CBTCockFlag == true)
+                CBTCock();
+            if (ssh.CBTBallsFlag == true)
+                CBTBalls();
+            if (ssh.CBTBothFlag == true)
+                CBTBoth();
+            if (ssh.CustomTask == true)
+                RunCustomTask();
+
+            return;
+
+
+
+            CheckResponse = CheckResponse.Replace(" ", "");
+
+
+        FoundResponse:
+            ;
+            if (StrokeTauntTimer.Enabled == true)
+            {
+                ssh.TempScriptCount = 0;
+                if (FrmSettings.SliderSTF.Value == 1)
+                    ssh.StrokeTauntTick = ssh.randomizer.Next(120, 241);
+                if (FrmSettings.SliderSTF.Value == 2)
+                    ssh.StrokeTauntTick = ssh.randomizer.Next(75, 121);
+                if (FrmSettings.SliderSTF.Value == 3)
+                    ssh.StrokeTauntTick = ssh.randomizer.Next(45, 76);
+                if (FrmSettings.SliderSTF.Value == 4)
+                    ssh.StrokeTauntTick = ssh.randomizer.Next(25, 46);
+                if (FrmSettings.SliderSTF.Value == 5)
+                    ssh.StrokeTauntTick = ssh.randomizer.Next(10, 24);
+            }
+
+            ssh.DomChat = ResponseClean(ssh.DomChat);
+
+            if (ssh.DomChat == "NULL")
+            {
+                ssh.DomChat = "";
+                return;
+            }
+
+            if (ssh.DoNotDisturb == true)
+            {
+                if (ssh.DomChat.Contains("@Interrupt") | ssh.DomChat.Contains("@Call(") | ssh.DomChat.Contains("@CallRandom("))
+                    ssh.DomChat = "#SYS_InterruptsOff";
+            }
+
+            TypingDelay();
+        }
+
+
+        public void CBTBalls()
+        {
+            var cbtFolder = Path.Combine(DomPersonalityPath, "CBT");
+            string File2Read = Path.Combine(cbtFolder, "CBTBalls_First.txt");
+
+            if (!ssh.CBTBallsFirst)
+                File2Read = Path.Combine(cbtFolder, "CBTBalls.txt");
+            else
+                ssh.CBTBallsCount += 1;
+
+            // Read all Lines of the given File.
+            List<string> BallList = Common.Txt2List(File2Read);
+
+            try
+            {
+                BallList = FilterList(BallList);
+                ssh.DomTask = BallList[ssh.randomizer.Next(0, BallList.Count)];
+            }
+            catch (Exception ex)
+            {
+                _log.WriteError("Tease AI did not return a valid @CBTBalls line from file: " + File2Read, ex, "CBTBalls()");
+                ssh.DomTask = "ERROR: Tease AI did not return a valid @CBTBalls line from file: " + File2Read;
+            }
+
+            ssh.CBTBallsFirst = false;
+
+            TypingDelayGeneric();
+        }
+
+            public void CBTCock()
+            {
+            var cbtFolder = Path.Combine(DomPersonalityPath, "CBT");
+
+            string File2Read = Path.Combine(cbtFolder, "CBTCock_First.txt");
+
+                if (!ssh.CBTCockFirst)
+                    File2Read = Path.Combine(cbtFolder, "CBTCock.txt");
+            else
+                    ssh.CBTCockCount += 1;
+
+                // Read all Lines of the given File.
+                List<string> CockList = Common.Txt2List(File2Read);
+
+                try
+                {
+                    CockList = FilterList(CockList);
+                    ssh.DomTask = CockList[ssh.randomizer.Next(0, CockList.Count)];
+                }
+                catch (Exception ex)
+                {
+                    _log.WriteError("Tease AI did not return a valid @CBTCock line from file: " + File2Read, ex, "CBTCock()");
+                    ssh.DomTask = "ERROR: Tease AI did not return a valid @CBTCock line from file: " + File2Read;
+                }
+
+                ssh.CBTCockFirst = false;
+
+                TypingDelayGeneric();
+            }
+
+        public void CBTBoth()
+        {
+            var cbtFolder = Path.Combine(DomPersonalityPath, "CBT");
+            string File2Read = Path.Combine(cbtFolder, "CBTBalls_First.txt");
+
+            if (!ssh.CBTBothFirst)
+                File2Read = Path.Combine(cbtFolder, "CBTBalls.txt");
+            else
+            {
+                ssh.CBTBallsCount += 1;
+                ssh.CBTCockCount += 1;
+            }
+
+            // Read all Lines of the given File.
+            List<string> BothList = Common.Txt2List(File2Read);
+
+            File2Read = Path.Combine(cbtFolder, "CBTCock_First.txt");
+
+            if (!ssh.CBTBothFirst)
+                File2Read = Path.Combine(cbtFolder, "CBTCock.txt");
+            else
+            {
+                ssh.CBTBallsCount += 1;
+                ssh.CBTCockCount += 1;
+            }
+
+            // Read all Lines of the given file and append to List.
+            BothList.AddRange(Common.Txt2List(File2Read));
+
+            try
+            {
+                BothList = FilterList(BothList);
+                ssh.DomTask = BothList[ssh.randomizer.Next(0, BothList.Count)];
+            }
+            catch (Exception ex)
+            {
+                _log.WriteError("Tease AI did not return a valid @CBT line from file: " + File2Read, ex, "CBTBoth()");
+                ssh.DomTask = "ERROR: Tease AI did not return a valid @CBT line from file: " + File2Read;
+            }
+
+            ssh.CBTBothFirst = false;
+
+            TypingDelayGeneric();
+        }
+
+
+        public void RunCustomTask()
+        {
+            string File2Read = ssh.CustomTaskTextFirst;
+
+            if (ssh.CustomTaskFirst == false)
+                File2Read = ssh.CustomTaskText;
+
+            // Read all Lines of the given File.
+            List<string> CustomList = Common.Txt2List(File2Read);
+
+            try
+            {
+                CustomList = FilterList(CustomList);
+                ssh.DomTask = CustomList[ssh.randomizer.Next(0, CustomList.Count)];
+            }
+            catch (Exception ex)
+            {
+                _log.WriteError("Tease AI did not return a valid Custom Task line from file: " + File2Read, ex, "RunCustomTask()");
+                ssh.DomTask = "ERROR: Tease AI did not return a valid Custom Task line from file: " + File2Read;
+            }
+
+            ssh.CustomTaskFirst = false;
+
+            TypingDelayGeneric();
+        }
+
+        private bool IsBegScriptEnabled(string path)
+        {
+            return true;
+        }
+        public void RunLastBegScript()
+        {
+            ssh.StrokeTauntVal = -1;
+            ClearModes();
+
+            // Debug.Print("RunLastBegScript() Called")
+            List<string> EndList = new List<string>();
+
+            var strokeEndFolder = Path.Combine(DomPersonalityPath, "Stroke/End");
+            foreach (string foundFile in Directory.EnumerateFiles(strokeEndFolder, "*.txt"))
+            {
+                string TempEnd = foundFile;
+                TempEnd = TempEnd.Replace(".txt", "");
+                while (!!TempEnd.Contains(@"\"))
+                    TempEnd = TempEnd.Remove(0, 1);
+                // TODO
+
+
+                if (!ssh.OrgasmRestricted)
+                {
+                    if (TempEnd.IndexOf("_BEG", StringComparison.OrdinalIgnoreCase) >= 0 && IsBegScriptEnabled(foundFile))
+                        EndList.Add(foundFile);
+                }
+                else if (TempEnd.IndexOf("_RESTRICTED", StringComparison.OrdinalIgnoreCase) >= 0 && IsBegScriptEnabled(foundFile))
+                    EndList.Add(foundFile);
+            }
+
+
+            if (EndList.Count < 1)
+            {
+                if (ssh.OrgasmRestricted == false)
+                    ssh.FileText = Path.Combine(DomPersonalityPath, "System/Scripts/End_BEG.txt");
+                else
+                    ssh.FileText = Path.Combine(DomPersonalityPath, @"System/Scripts/End_RESTRICTED.txt");
+            }
+            else
+                ssh.FileText = EndList[ssh.randomizer.Next(0, EndList.Count)];
+
+            ssh.LockImage = false;
+            if (ssh.SlideshowLoaded == true)
+            {
+                OnSlideshowEnable();
+                //nextButton.Enabled = true;
+                //previousButton.Enabled = true;
+                //PicStripTSMIdommeSlideshow.Enabled = true;
+            }
+
+            ssh.StrokeTauntVal = -1;
+            ssh.ScriptTick = 4;
+            ScriptTimer.Start();
+            ssh.LastScript = true;
+        }
+
+        public void ShowImage(string path, bool waitToFinish)
+        {
+            throw new NotImplementedException("TODO");
+        }
+        public void YesOrNoQuestions()
+        {
+            if (ssh.CBT)
+            {
+                if (ssh.ChatString.IndexOf("done", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    ssh.ChatString.IndexOf("finish", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    ssh.YesOrNo = false;
+                    ssh.CBT = false;
+                    return;
+                }
+                else
+                {
+                    ssh.DomChat = "Hurry up and tell me when you're done";
+                    TypingDelay();
+                    return;
+                }
+            }
+
+            string dir;
+
+            dir = ssh.FileText;
+
+            // Read all lines of File
+            List<string> lines = Common.Txt2List(dir);
+            int line;
+
+            line = ssh.StrokeTauntVal;
+
+            ssh.tempResponseLine = -1;
+            ssh.checkAnswers.clearAnswers();
+            do
+            {
+                line += 1;
+                Debug.Print("YESNO Line = " + lines[line]);
+                string getWords = Common.GetParentheses(lines[line], "[");
+                getWords = PoundClean(getWords, PoundOptions.CommaSepList);
+                ssh.checkAnswers.addToAnswerList(getWords);
+            }
+            while (lines[line + 1].IndexOf("@AcceptAnswer", StringComparison.OrdinalIgnoreCase) == -1 && lines[line + 1].IndexOf("@DifferentAnswer", StringComparison.OrdinalIgnoreCase) == -1);
+            ssh.tempResponseLine = line + 1;
+            line = ssh.StrokeTauntVal;
+
+            string CheckLines;
+            string ChatReplace = string.Empty;
+
+            // we get the trigger word that is present in the chat (if there is a word that matches one of the answers)
+            string triggerWord = ssh.checkAnswers.triggerWord(ssh.ChatString);
+
+            // we check to see what answer to trigger only if there was a trigger word, otherwise we move directly to the noanswer found part
+            var found = false;
+            if (triggerWord != "")
+            {
+                do
+                {
+                    line += 1;
+                    CheckLines = lines[line];
+                    int checkResult = -1;
+                    string[] Splits = CheckLines.Split(new char[] { ']' });
+                    Splits[0] = Splits[0].Replace("[", "");
+                    ChatReplace = CheckLines.Replace("[" + Splits[0] + "]", "");
+                    Splits[0] = PoundClean(Splits[0], PoundOptions.CommaSepList);
+
+                    // we check to see if what the user wrote contains one of the keywords for the different yes/no/etc responses
+                    // this is useful if the script contains something like [yes,maybe] as an answer option
+                    // if the user write maybe then it will not need to use the honorific but if he writes yes, instead, it will check the honorific
+                    if (Splits[0].IndexOf(triggerWord, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    {
+                        string checkFor = ssh.checkAnswers.returnSystemWord(triggerWord);
+                        if (checkFor == "")
+                            checkResult = checkSubAnswer(Splits[0]);
+                        else
+                            checkResult = checkSubAnswer(checkFor);
+                    }
+
+                    if (checkResult == 1)
+                    {
+                        found = true;
+                        break;
+                    }
+                    else if (checkResult == 0)
+                    {
+                        checkForPunish();
+                        return;
+                    }
+                }
+                //while (!Strings.InStr(Strings.UCase(lines[line + 1]), Strings.UCase("@DifferentAnswer")) != 0 | Strings.InStr(Strings.UCase(lines[line + 1]), Strings.UCase("@AcceptAnswer")) != 0);
+                while (lines[line + 1].IndexOf("@AcceptAnswer", StringComparison.OrdinalIgnoreCase) == -1 && lines[line + 1].IndexOf("@DifferentAnswer", StringComparison.OrdinalIgnoreCase) == -1);
+            }
+
+            if (found)
+            {
+                // updateDommeName(ChatReplace)
+                ssh.DomChat = ChatReplace;
+                // we clear the answer list 
+                if (ssh.DomChat.Contains("@NullResponse"))
+                    ssh.NullResponse = true;
+                if (ssh.DomChat.Contains("@LoopAnswer"))
+                {
+                    ssh.DomChat = ssh.DomChat.Replace("@LoopAnswer", "");
+                    // CleanParse()
+                    TypingDelay();
+                    return;
+                }
+
+                ssh.YesOrNo = false;
+                YesOrNoLanguageCheck();
+
+
+                if (ssh.GotoFlag == false)
+                    ssh.StrokeTauntVal = ssh.tempResponseLine;
+
+                TypingDelay();
+
+                return;
+            }
+
+            if (checkSubAnswer() == 0)
+            {
+                checkForPunish();
+                return;
+            }
+            if (lines[ssh.tempResponseLine].IndexOf("DifferentAnswer", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                ssh.DomChat = lines[ssh.tempResponseLine];
+                ssh.DomChat = ssh.DomChat.Replace("@DifferentAnswer ", "");
+
+                ssh.DomChat = ssh.DomChat.Replace("@LoopAnswer", "");
+                // CleanParse()
+                TypingDelay();
+                return;
+            }
+
+            if (lines[ssh.tempResponseLine].IndexOf("AcceptAnswer", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                // ssh.DomChat = lines(line)
+                ssh.DomChat = lines[ssh.tempResponseLine];
+                // TimedAnswerTimer.Stop()
+
+                ssh.DomChat = ssh.DomChat.Replace("@AcceptAnswer ", "");
+                ScriptTimer.Start();
+                ssh.YesOrNo = false;
+
+                YesOrNoLanguageCheck();
+
+                if (!ssh.GotoFlag)
+                    ssh.StrokeTauntVal = ssh.tempResponseLine;
+                TypingDelay();
+                return;
+            }
+        }
+
+        private void checkForPunish()
+        {
+            if (ssh.nameErrors >= 2 & ssh.wrongAttempt)
+            {
+                ssh.DomChat = "";
+                if (ssh.contactToUse.Equals(ssh.SlideshowContact1))
+                    ssh.DomChat = "@Contact1 ";
+                else if (ssh.contactToUse.Equals(ssh.SlideshowContact2))
+                    ssh.DomChat = "@Contact2 ";
+                else if (ssh.contactToUse.Equals(ssh.SlideshowContact3))
+                    ssh.DomChat = "@Contact3 ";
+                ssh.DomChat += "#SYS_HonorificPunish";
+                ssh.wrongAttempt = false;
+            }
+            TypingDelay();
+        }
+
+
+        public void YesOrNoLanguageCheck()
+        {
+            if (ssh.DomChat.IndexOf("@Goto(", StringComparison.OrdinalIgnoreCase) >= 0)
+                GetGotoChat();
+        }
+
+        public void GetGotoChat()
+        {
+            ssh.GotoFlag = true;
+
+            // @Chance will not execute the code below.
+            if (ssh.DomChat.IndexOf("@Goto(", StringComparison.OrdinalIgnoreCase) < 0) return;
+
+            ssh.DomTypeCheck = true;
+
+            string TempGoto = ssh.DomChat + " some garbage";
+            int GotoIndex = TempGoto.IndexOf("@Goto(") + 6;
+            TempGoto = TempGoto.Substring(GotoIndex, TempGoto.Length - GotoIndex);
+            TempGoto = TempGoto.Split(')')[0];
+            ssh.FileGoto = TempGoto;
+
+            string StripGoto = ssh.FileGoto;
+
+            if (TempGoto.Contains(","))
+            {
+                TempGoto = TempGoto.Replace(", ", ",");
+                string[] GotoSplit = TempGoto.Split(',');
+                int GotoTemp = ssh.randomizer.Next(0, GotoSplit.Count());
+                ssh.FileGoto = GotoSplit[GotoTemp];
+            }
+
+            string GotoText;
+
+            GotoText = ssh.FileText;
+
+            if (File.Exists(GotoText))
+            {
+                // Read all lines of File
+                List<string> gotolines = Common.Txt2List(GotoText);
+                int gotoline = -1;
+
+                if (StripGoto.Substring(0, 1) != "(")
+                    StripGoto = "(" + StripGoto + ")";
+                if (ssh.FileGoto.Substring(0, 1) != "(")
+                    ssh.FileGoto = "(" + ssh.FileGoto + ")";
+
+                ssh.DomChat = ssh.DomChat.Replace("@Goto" + StripGoto, "");
+                try
+                {
+                    do
+                        gotoline += 1;
+                    while (!gotolines[gotoline].StartsWith(ssh.FileGoto));
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    // ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
+                    // ArgumentOutOfRangeException - Regular Script
+                    // ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨
+                    throw new ArgumentOutOfRangeException("The Goto-Destination \"" + ssh.FileGoto + "\" in file \"" + GotoText + "\" was not found.", ex);
+                }
+
+                ssh.StrokeTauntVal = gotoline;
+            }
+            else
+                throw new FileNotFoundException("The Goto-File \"" + GotoText + "\" was not found.");
+
+        }
+
+
+        private int CountWords(string value) 
+        {
+            var collection = Regex.Matches(value, @"\S+");
+
+            return collection.Count;
+        }
+
+
+        private void OnPauseControls()
+        {
+            throw new NotImplementedException();
+            /*
+             *                     DomWMP.Ctlcontrols.pause();
+
+             */
+        }
+
+        private void OnStopVideo()
+        {
+            throw new NotImplementedException();
+            /*
+             *                     DomWMP.Visible = false;
+                    DomWMP.Ctlcontrols.stop();
+                    mainPictureBox.Visible = true;
+
+             */
+        }
+
+        private void TypingNoDelay()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnPauseCheck(out bool bPauseCheck)
         {
             /*
             if (FrmSettings.CBSettingsPause.Checked == true & FrmSettings.SettingsPanel.Visible == true)
@@ -2274,6 +3297,7 @@ namespace Tai.Common
                 return;
             }
             */
+            bPauseCheck = false;
         }
 
 
@@ -2353,10 +3377,11 @@ namespace Tai.Common
             ssh.tempDomHonorific = ssh.tempHonorific;
             if (ssh.tempDomName != _settings.DomName)
             {
-                string avatarImage = checkForImage("/avatar.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact));
+                string avatarImage = checkForImage("/avatar.*", ssh.SlideshowMain.getCurrentBaseFolder());
                 if (avatarImage == "")
-                    avatarImage = ssh.SlideshowMain.ImageList(ssh.randomizer.Next(0, ssh.SlideshowMain.ImageList().Count - 1));
-                domAvatar.Image = Image.FromFile(avatarImage);
+                    avatarImage = ssh.SlideshowMain.ImageList[ssh.randomizer.Next(0, ssh.SlideshowMain.ImageList.Count - 1)];
+                OnSetAvatarImage(avatarImage);
+                //domAvatar.Image = Image.FromFile(avatarImage);
                 ssh.domAvatarImage = avatarImage;
             }
             ssh.shortName = ssh.SlideshowMain.ShortName;
@@ -2367,10 +3392,7 @@ namespace Tai.Common
             ShowImage(ssh.SlideshowMain.CurrentImage, false);
             ssh.SlideshowLoaded = true;
             ssh.JustShowedBlogImage = false;
-
-            nextButton.Enabled = true;
-            previousButton.Enabled = true;
-            PicStripTSMIdommeSlideshow.Enabled = true;
+            OnSlideshowEnable();
 
             if (ssh.RiskyDeal == true)
                 FrmCardList.PBRiskyPic.Image = Image.FromFile(ssh.SlideshowMain.CurrentImage);
@@ -2382,33 +3404,87 @@ namespace Tai.Common
             }
         }
 
+        public void CheckRandomOpportunities()
+        {
+            DirectoryInfo randomDir = null;
 
+            try
+            {
+                if (!string.IsNullOrEmpty(_settings.RandomImageDir) && Directory.Exists(_settings.RandomImageDir))
+                    randomDir = new DirectoryInfo(_settings.RandomImageDir);
+                else
+                {
+                    _settings.CBRandomGlitter = false;
+                    _settings.CBRandomDomme = false;
+                    return;
+                }
+
+                if (randomDir.GetDirectories().Count() <= 0)
+                {
+                    _settings.CBRandomGlitter = false;
+                    _settings.CBRandomDomme = false;
+                }
+                else
+                {
+                    //pass
+                }
+
+                if (randomDir.GetDirectories().Count() < 4)
+                {
+                    _settings.CBRandomGlitter = false;
+                }
+
+                if (randomDir.GetDirectories().Count() >= 4)
+                {
+                    //pass
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.WriteError($"Error checking random opportunities {ex}");
+                _settings.CBRandomGlitter = false;
+                _settings.CBRandomDomme = false;
+            }
+        }
+
+        private bool AnyVideoFiles(string path)
+        {
+            try
+            {
+                return DirectoryExt.AnyVideoFiles(path);
+            } catch (Exception ex)
+            {
+                _log.WriteError($"Failed checking {path} for video files: {ex}");
+                return false;
+            }
+        }
         public void InitDommeImageFolder()
         {
             if (_settings.CBAutoDomPP || _settings.CBRandomDomme)
             {
-                string avatarImage = checkForImage("/avatar*.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact));
+                string avatarImage = checkForImage("/avatar*.*", ssh.SlideshowMain.getCurrentBaseFolder());
                 if (string.IsNullOrEmpty(avatarImage))
                     avatarImage = ssh.SlideshowMain.ImageList[ssh.randomizer.Next(0, ssh.SlideshowMain.ImageList.Count - 1)];
                 OnSetAvatarImage(avatarImage);
 
                 ssh.domAvatarImage = avatarImage;
-                string glitterImage2 = checkForImage("/glitter*.*", ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact));
+                string glitterImage2 = checkForImage("/glitter*.*", ssh.SlideshowMain.getCurrentBaseFolder());
                 if (string.IsNullOrEmpty(glitterImage2))
                     glitterImage2 = avatarImage;
                 if (!string.IsNullOrEmpty(glitterImage2))
                 {
-                    FrmSettings.GlitterAV.Image = Image.FromFile(glitterImage2);
-                    if (!FrmSettings.CBRandomDomme.Checked)
-                        _settings.GlitterAV = glitterImage2;
+                    //FrmSettings.GlitterAV.Image = Image.FromFile(glitterImage2);
+                    //if (!FrmSettings.CBRandomDomme.Checked)
+                    _settings.GlitterAV = glitterImage2;
+
                 }
             }
             CheckRandomOpportunities();
-            if (FrmSettings.CBRandomGlitter.Checked && FrmSettings.CBRandomGlitter.Enabled)
+            if (_settings.CBRandomGlitter)
             {
-                string Contact1dirspecial = _settings.RandomImageDir + @"\#Contact1";
-                string Contact2dirspecial = _settings.RandomImageDir + @"\#Contact2";
-                string Contact3dirspecial = _settings.RandomImageDir + @"\#Contact3";
+                string Contact1dirspecial = Path.Combine(_settings.RandomImageDir, @"#Contact1");
+                string Contact2dirspecial = Path.Combine(_settings.RandomImageDir, @"#Contact2");
+                string Contact3dirspecial = Path.Combine(_settings.RandomImageDir, @"#Contact3");
                 string Contact1path = "";
                 string Contact2path = "";
                 string Contact3path = "";
@@ -2463,7 +3539,6 @@ namespace Tai.Common
                 if (glitterImage != "")
                 {
                     _settings.GlitterAV1 = glitterImage;
-                    FrmSettings.GlitterAV1.Image = Image.FromFile(glitterImage);
                 }
                 ssh.SlideshowContact2 = CreateContactData(ContactType.Contact2);
                 ssh.SlideshowContact2.LoadNew(ssh.newSlideshow);
@@ -2473,7 +3548,6 @@ namespace Tai.Common
                 if (glitterImage != "")
                 {
                     _settings.GlitterAV2 = glitterImage;
-                    FrmSettings.GlitterAV2.Image = Image.FromFile(glitterImage);
                 }
 
                 ssh.SlideshowContact3 = CreateContactData(ContactType.Contact3);
@@ -2484,91 +3558,47 @@ namespace Tai.Common
                 if (glitterImage != "")
                 {
                     _settings.GlitterAV3 = glitterImage;
-                    FrmSettings.GlitterAV3.Image = Image.FromFile(glitterImage);
                 }
             }
-            string RandImgDirectoryD = @"\#RandomPics";
-            string RandImgPathDirectoryD = ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact) + RandImgDirectoryD;
-            string ClipDirectoryD = @"\#Clips";
-            string ClipPathDirectoryD = ssh.SlideshowMain.getCurrentBaseFolder(ssh.SlideshowMain.Contact) + ClipDirectoryD;
-            if ((Directory.Exists(RandImgDirectoryD)))
+            string RandImgDirectoryD = @"#RandomPics";
+            string RandImgPathDirectoryD = Path.Combine(ssh.SlideshowMain.getCurrentBaseFolder(), RandImgDirectoryD);
+            string ClipDirectoryD = @"#Clips";
+            string ClipPathDirectoryD = Path.Combine(ssh.SlideshowMain.getCurrentBaseFolder(), ClipDirectoryD);
+            if (Directory.Exists(RandImgDirectoryD))
+            {
 
                 // Conversions.ToString(_settings.PropertyValues["DomImageDirRand"].Property.DefaultValue)
                 _settings.DomImageDirRand = RandImgPathDirectoryD;
+            }
             if ((Directory.Exists(ClipPathDirectoryD)))
             {
-                string def = _settings.PropertyValues("VideoSoftcoreD").Property.DefaultValue;
-                _settings.VideoSoftcoreD = ClipPathDirectoryD + @"\Softcore";
-                if (FrmSettings.VideoSoftcoreD_Count(false) != 0)
-                    _settings.CBSoftcoreD = true;
-                else
-                {
-                    _settings.CBSoftcoreD = false;
-                    _settings.VideoSoftcoreD = def;
-                }
-                def = _settings.PropertyValues("VideoHardcoreD").Property.DefaultValue;
-                _settings.VideoHardcoreD = ClipPathDirectoryD + @"\Hardcore";
-                if (FrmSettings.VideoHardcoreD_Count(false) != 0)
-                    _settings.CBHardcoreD = true;
-                else
-                {
-                    _settings.CBHardcoreD = false;
-                    _settings.VideoHardcoreD = def;
-                }
-                def = _settings.PropertyValues("VideoLesbianD").Property.DefaultValue;
-                _settings.VideoLesbianD = ClipPathDirectoryD + @"\Lesbian";
-                if (FrmSettings.VideoLesbianD_Count(false) != 0)
-                    _settings.CBLesbianD = true;
-                else
-                {
-                    _settings.CBLesbianD = false;
-                    _settings.VideoLesbianD = def;
-                }
-                def = _settings.PropertyValues("VideoBlowjobD").Property.DefaultValue;
-                _settings.VideoBlowjobD = ClipPathDirectoryD + @"\Blowjob";
-                if (FrmSettings.VideoBlowjobD_Count(false) != 0)
-                    _settings.CBBlowjobD = true;
-                else
-                {
-                    _settings.CBBlowjobD = false;
-                    _settings.VideoBlowjobD = def;
-                }
-                def = _settings.PropertyValues("VideoFemsubD").Property.DefaultValue;
-                _settings.VideoFemsubD = ClipPathDirectoryD + @"\Femsub";
-                if (FrmSettings.VideoFemsubD_Count(false) != 0)
-                    _settings.CBFemsubD = true;
-                else
-                {
-                    _settings.CBFemsubD = false;
-                    _settings.VideoFemsubD = def;
-                }
-                def = _settings.PropertyValues("VideoJOID").Property.DefaultValue;
-                _settings.VideoJOID = ClipPathDirectoryD + @"\JOI";
-                if (FrmSettings.VideoJOID_Count(false) != 0)
-                    _settings.CBJOID = true;
-                else
-                {
-                    _settings.CBJOID = false;
-                    _settings.VideoJOID = def;
-                }
-                def = _settings.PropertyValues("VideoCHD").Property.DefaultValue;
-                _settings.VideoCHD = ClipPathDirectoryD + @"\CH";
-                if (FrmSettings.VideoCHD_Count(false) != 0)
-                    _settings.CBCHD = true;
-                else
-                {
-                    _settings.CBCHD = false;
-                    _settings.VideoCHD = def;
-                }
-                def = _settings.PropertyValues("VideoGeneralD").Property.DefaultValue;
-                _settings.VideoGeneralD = ClipPathDirectoryD + @"\General";
-                if (FrmSettings.VideoGeneralD_Count(false) != 0)
-                    _settings.CBGeneralD = true;
-                else
-                {
-                    _settings.CBGeneralD = false;
-                    _settings.VideoGeneralD = def;
-                }
+                // this is the original setting ??
+                //string def = _settings.PropertyValues("VideoSoftcoreD").Property.DefaultValue;
+                _settings.VideoSoftcoreD = Path.Combine(ClipPathDirectoryD, @"Softcore");
+                _settings.CBSoftcoreD = AnyVideoFiles(_settings.VideoSoftcoreD);
+
+                //def = _settings.PropertyValues("VideoHardcoreD").Property.DefaultValue;
+                _settings.VideoHardcoreD = Path.Combine(ClipPathDirectoryD, "Hardcore");
+                _settings.CBHardcoreD = AnyVideoFiles(_settings.VideoHardcoreD);
+
+                _settings.VideoLesbianD = Path.Combine(ClipPathDirectoryD, "Lesbian");
+                _settings.CBLesbianD = AnyVideoFiles(_settings.VideoLesbianD);
+
+                _settings.VideoBlowjobD = Path.Combine(ClipPathDirectoryD, "Blowjob");
+                _settings.CBBlowjobD = AnyVideoFiles(_settings.VideoBlowjobD);
+
+                _settings.VideoFemsubD = Path.Combine(ClipPathDirectoryD, "Femsub");
+                _settings.CBFemsubD = AnyVideoFiles(_settings.VideoFemsubD);
+
+                _settings.VideoJOID = Path.Combine(ClipPathDirectoryD, "JOI");
+                _settings.CBJOID = AnyVideoFiles(_settings.VideoJOID);
+
+                _settings.VideoCHD = Path.Combine(ClipPathDirectoryD, "CH");
+                _settings.CBCHD = AnyVideoFiles(_settings.VideoCHD);
+
+                _settings.VideoGeneralD = Path.Combine(ClipPathDirectoryD, "General");
+                _settings.CBGeneralD = AnyVideoFiles(_settings.VideoGeneralD);
+
             }
             if (ssh.currentlyPresentContacts.Count == 0)
                 ssh.currentlyPresentContacts.Add(ssh.SlideshowMain.TypeName);
@@ -2657,7 +3687,7 @@ namespace Tai.Common
                     tmpImgLoc = ImageToShow;
                 else if (throwException)
                     throw new Exception("\"" + Path.GetFileName(ImageToShow) + "\" was not found in \"" + Path.GetDirectoryName(ImageToShow) + "\"!" + Environment.NewLine + Environment.NewLine + "Please make sure the file exists and it is spelled correctly in the script.");
-                
+
             }
             catch (Exception ex)
             {
@@ -2671,7 +3701,168 @@ namespace Tai.Common
         }
 
 
+        private bool IsModuleEnabled(string path)
+        {
+            return true;
+        }
+        public void RunModuleScript(bool IsEdging)
+        {
+            if (ssh.MultiTauntPictureHold)
+                ssh.MultiTauntPictureHold = false;
+            ssh.StrokeTauntVal = -1;
+            ssh.isLink = false;
+            ssh.ShowModule = true;
+            ssh.FirstRound = false;
+            ssh.TauntEdging = false;
+
+            ssh.AskedToGiveUpSection = false;
+            List<string> ModuleList = new List<string>();
+            ModuleList.Clear();
+
+            string ChastityModuleCheck = "*.txt";
+            if (_settings.Chastity == true && !IsEdging)
+            {
+                ssh.AskedToSpeedUp = false;
+                ssh.AskedToSlowDown = false;
+                ssh.SubStroking = false;
+                ssh.SubEdging = false;
+                ssh.SubHoldingEdge = false;
+                StrokeTimer.Stop();
+                StrokeTauntTimer.Stop();
+                EdgeTauntTimer.Stop();
+                HoldEdgeTauntTimer.Stop();
+                ChastityModuleCheck = "*_CHASTITY.txt";
+            }
+
+            if (!ssh.Playlist || ssh.PlaylistFile.Count == 0 || ssh.PlaylistFile[ssh.PlaylistCurrent].Contains("Random Module"))
+            {
+                if (ssh.SetModule != "")
+                    ssh.FileText = ssh.SetModule;
+                else
+                {
+                    var modulePath = Path.Combine(DomPersonalityPath, "Modules");
+                    foreach (string foundFile in Directory.EnumerateFiles(modulePath, ChastityModuleCheck))
+                    {
+                        string TempModule = foundFile;
+                        TempModule = Path.GetFileName(TempModule).Replace(".txt", "");
+                        if (IsEdging)
+                        {
+                            while (!!TempModule.Contains(@"\"))
+                                TempModule = TempModule.Remove(0, 1);
+                        }
+
+                        if (_settings.Chastity)
+                        {
+                            if (!foundFile.Contains("_EDGING"))
+                                ModuleList.Add(foundFile);
+                        }
+                        else if (IsEdging)
+                        {
+                            if (foundFile.Contains("_EDGING"))
+                                ModuleList.Add(foundFile);
+                        }
+                        else if (!foundFile.Contains("_EDGING") && !foundFile.Contains("_CHASTITY"))
+                            ModuleList.Add(foundFile);
+
+                    }
+
+                    if (ModuleList.Count < 1)
+                    {
+                        if (_settings.Chastity)
+                            ssh.FileText = Path.Combine(DomPersonalityPath, "System/Scripts/Module_CHASTITY.txt");
+                        else if (IsEdging)
+                            ssh.FileText = Path.Combine(DomPersonalityPath, "System/Scripts/Module_EDGING.txt");
+                        else
+                            ssh.FileText = Path.Combine(DomPersonalityPath, "System/Scripts/Module.txt");
+                    }
+                    else
+                        ssh.FileText = ModuleList[ssh.randomizer.Next(0, ModuleList.Count)];
+                }
+            }
+            else if (ssh.PlaylistFile[ssh.PlaylistCurrent].Contains("Regular-TeaseAI-Script"))
+            {
+                ssh.FileText = Path.Combine(DomPersonalityPath, "Modules", ssh.PlaylistFile[ssh.PlaylistCurrent]);
+                ssh.FileText = ssh.FileText.Replace(" Regular-TeaseAI-Script", "");
+                ssh.FileText = ssh.FileText + ".txt";
+            }
+            else
+                ssh.FileText = Path.Combine(DomPersonalityPath, "Playlist/Modules", ssh.PlaylistFile[ssh.PlaylistCurrent] + ".txt");
+
+            ssh.SetModule = "";
+
+            ssh.DomTask = ssh.DomTask.Replace("@Module", "");
+
+
+            if (ssh.SetModuleGoto != "")
+            {
+                ssh.FileGoto = ssh.SetModuleGoto;
+                ssh.SkipGotoLine = true;
+                GetGoto();
+                ssh.SetModuleGoto = "";
+            }
+            else
+                ssh.StrokeTauntVal = -1;
+
+            if (ssh.Playlist == true)
+                ssh.PlaylistCurrent += 1;
+
+            if (!IsEdging)
+            {
+                if (ssh.Playlist == true)
+                    ssh.BookmarkModule = false;
+
+                if (ssh.BookmarkModule == true)
+                {
+                    ssh.BookmarkModule = false;
+                    ssh.FileText = ssh.BookmarkModuleFile;
+                    ssh.StrokeTauntVal = ssh.BookmarkModuleLine;
+                }
+
+                ssh.ScriptTick = 3;
+            }
+            else
+                ssh.ScriptTick = 4;
+
+            ScriptTimer.Start();
+        }
+
+        public void CBTScript()
+        {
+            try
+            {
+                string FilePath = Path.Combine(DomPersonalityPath, "CBT", "CBT.txt");
+
+                if (!Directory.Exists(Path.GetDirectoryName(FilePath)) || !File.Exists(FilePath))
+                    throw new Exception("TEASE-AI: unable to locate CBT-File: " + FilePath);
+                else
+                {
+                    List<string> lines = Common.Txt2List(FilePath);
+                    if (lines.Count == 0)
+                        throw new Exception("TEASE-AI: CBT-file is empty: " + FilePath);
+
+                    lines = FilterList(lines);
+                    if (lines.Count == 0)
+                        throw new Exception("TEASE-AI: No available lines in CBT-file: " + FilePath);
+
+                    int CBTCount;
+
+                    CBTCount = ssh.randomizer.Next(0, lines.Count);
+
+                    ssh.DomTask = lines[CBTCount];
+                    ssh.CBT = true;
+                    ssh.YesOrNo = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ssh.DomTask = ex.Message;
+                _log.WriteError(ex.Message, ex, "CBTScript()");
+            }
+            finally
+            {
+                TypingDelayGeneric();
+            }
+        }
     }
 
-#endif
 }

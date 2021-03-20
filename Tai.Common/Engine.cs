@@ -169,7 +169,7 @@ namespace Tai.Common
 
                             continue;
                         }
-                        VocabLines = FilterList(VocabLines);
+                        VocabLines = FilterList(VocabLines); //, false, 0);
 
                         if (ControlCustom.Contains(Keyword.ToString()))
                             customVocabLines = VocabLines;
@@ -241,10 +241,9 @@ namespace Tai.Common
         public List<string> FilterList(List<string> ListClean)
         {
             /* TODO ERROR: Skipped IfDirectiveTrivia *//* TODO ERROR: Skipped DisabledTextTrivia *//* TODO ERROR: Skipped EndIfDirectiveTrivia */
-            bool FilterPass;
             int ListIncrement = 1;
-            if (ssh.StrokeFilter == true)
-                ListIncrement = ssh.StrokeTauntCount;
+            //if (strokeFilter == true)
+            //    ListIncrement = strokeTauntCount;
 
             // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
             // Check if Grouped-Lines-Files have the right amount of Lines
